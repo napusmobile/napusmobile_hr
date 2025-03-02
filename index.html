@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/4.1.4/signature_pad.umd.min.js"></script>
+  <?!= include ('CS/css') ?>
+  <title>Booking | Epic Coding Channel</title>
+</head>
+  <body>
+  
+<?!= include ('FormLogin') ?>
+
+<section id="dashboardPage" style="display:none">
+  <?!= include ('Page/Sidebar') ?>
+  <div class="sidebar-overlay"></div>
+
+  <main class="bg-light">
+    <div class="p-2">
+      <?!= include ('Page/Navbar') ?>
+      
+    <section id="page1">
+      <?!= include ('Page/00_Home') ?>
+    </section>
+
+    <section id="page2" style="display:none">
+      <?!= include ('Page/01_leaveReqBody') ?>
+    </section>
+
+    <section id="page3" style="display:none">
+      <?!= include ('Page/02_reqListTblBody') ?>
+    </section>
+
+    <section id="page4" style="display:none">
+      <?!= include ('Page/03_Salary') ?>
+    </section>
+
+    <section id="page5" style="display:none">
+      <?!= include ('Page/04_Summary') ?>
+    </section>
+
+    <section id="page6" style="display:none">
+      <?!= include ('Page/05_Employee') ?>
+    </section>
+
+    <section id="page7" style="display:none">
+     <?!= include ('Page/06_NewsDB') ?>
+    </section>
+
+    <section id="page8" style="display:none">
+     <?!= include ('Page/07_ReportAT') ?>
+    </section>
+
+    <section id="page9" style="display:none">
+     <?!= include ('Page/08_ReportLeave') ?>
+    </section>
+
+    <section id="page10" style="display:none">
+      <?!= include ('US/DataTableRecUser') ?>
+    </section>
+
+    <section id="page11" style="display:none">
+      <?!= include ('US/DataTableUser') ?>
+    </section>
+  
+    <section id="page12" style="display:none">
+      <?!= include ('Page/09_settingsystem') ?>
+    </section>
+
+    <section id="page13" style="display:none">
+      <?!= include ('Page/10_Configuration') ?>
+    </section>
+
+  </main>
+  <?!= include ('Page/00_Chatbot') ?>
+</section>
+  
+  <?!= include ('Page/Setting') ?>
+  <?!= include ('MD/Modal') ?>
+  <?!= include ('MD/Changepassword') ?>
+  <?!= include ('JS/JavaScript') ?>
+  </body>
+</html>
