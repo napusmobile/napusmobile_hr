@@ -1,0 +1,1054 @@
+<div class="modal fade" id="RegisterModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RegisterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="text-center mb-2">
+          <h4 class="mb-0 fw-bold mt-2" id="textAddregis1">👦 เพิ่มข้อมูลผู้ใช้งาน</h4>
+          <h5 class="mb-0 fw-bold mt-2" id="textAddregis2" style="display:none">👦 แก้ไขข้อมูลผู้ใช้งาน</h5>
+        </div>
+        <form id="addRegicter">
+          <input type="text" class="form-control" id="registerDataID" name="registerDataID" hidden>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center justify-content-center">
+                  <div style="width: 150px; height: 150px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border:3px solid white;" class="mb-3">
+                    <img id="regictorPreview" src="https://img2.pic.in.th/pic/vsvds.png" alt="รูปประจำตัว" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <input type="file" name="regictorImg" id="regictorImg" style="display:none">
+                </div>
+                <div class="mb-3">
+                  <label class="control-label">ตำแหน่ง <span class="text-danger">*</span></label>
+                  <select class="form-select" id="registerData1" name="registerData1" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="control-label">แผนก <span class="text-danger">*</span></label>
+                  <select class="form-select" id="registerData2" name="registerData2" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="control-label">ระดับผู้ใช้งาน <span class="text-danger">*</span></label>
+                  <select class="form-select" id="registerData3" name="registerData3" required>
+                    <option selected value="">กรุณาเลือกรายการ</option>
+                    <option value="SuperAdmin">SuperAdmin</option>
+                    <option value="Admin">Admin</option>
+                    <option value="SuperUser">SuperUser</option>
+                    <option value="User">User</option>
+                    <option value="Driver">Driver</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="control-label">ชื่อผู้ใช้งาน <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="registerData4" name="registerData4" placeholder="กรุณากรอกชื่อผู้ใช้งาน" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Username <span class="text-danger me-2">*</span><span id="resultMessage"></span></label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="registerData5" name="registerData5" placeholder="กรุณากรอก Username" required>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Password <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="registerData6" name="registerData6" placeholder="กรุณากรอก Password" required>
+                  <button class="btn set-button" type="button" onclick="password_showAdd_hide()">
+                    <i class="fa-regular fa-eye" id="showadd_eye"></i>
+                    <i class="fa-regular fa-eye-slash d-none" id="hideadd_eye"></i>
+                  </button>
+                  </div>
+                </div>
+        <div class="mt-2 text-center">
+          <button type="submit" class="btn set-button" onclick="submitRegisterForm()">บันทึกข้อมูล</button>
+          <button type="button" class="btn del-button" onclick="closeModalRegistor()" data-bs-dismiss="modal">ยกเลิก</button>
+        </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-2">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                <label for="regictorImg" class="btn edit-button w-100">อัพโหลดรูปคลิกที่นี่</label>
+                </div>
+                <div id="reviewdivprofile"></div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img id="imageModalSrc" src="" alt="Full Size Image" style="width: 100%; height: auto;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="bankSelectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="bankSelectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="text-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🏛️ เลือกธนาคารนำส่ง</h5>
+        </div>
+
+        <div id="bankSelectList" style="max-height: 500px; overflow-y: auto;"></div>
+
+        <div class="mt-2 text-center">
+          <button type="button" class="btn set-button" onclick="applyBankSelection()">นำส่งข้อมูล</button>
+          <button type="button" class="btn del-button" data-bs-dismiss="modal">ยกเลิก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="branchSelectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="branchSelectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🏢 เลือกสาขาสำหรับลงเวลา</h5>
+          <button type="button" class="btn del-button" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div id="branchSelectList" style="max-height: 500px; overflow-y: auto;"></div>
+
+        <div id="cameraSection" class="d-none">
+          <div class="mb-2">
+            <video id="cameraVideo" class="w-100 rounded border" autoplay playsinline></video>
+            <canvas id="cameraCanvas" style="display: none;"></canvas>
+            <img id="capturedImage" class="w-100 rounded border mt-2" style="display: none;">
+          </div>
+          <div class="d-flex gap-2 mb-2">
+            <button id="switchCameraBtn" class="btn upload-button w-100">
+              <i class="fa-solid fa-camera-rotate"></i> สลับกล้อง
+            </button>
+          </div>
+          <div class="d-flex gap-2">
+            <button id="captureBtn" class="btn set-button w-100">
+              <i class="fa-solid fa-camera"></i> ถ่ายรูป
+            </button>
+            <button id="recaptureBtn" class="btn del-button w-100" style="display: none;">
+              <i class="fa-solid fa-rotate"></i> ถ่ายใหม่
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <button type="button" id="checkin-button" class="btn upload-button w-100" onclick="submitCheckInTime('เข้างาน')">
+            <i class="fa-solid fa-circle-chevron-right"></i> ลงเวลาเข้า/CheckIN
+          </button>
+          <button type="button" id="ot-button" class="btn edit-button w-100" onclick="submitCheckInTime('OT')">
+            <i class="fa-regular fa-clock"></i> ลงเวลาเข้า/OT
+          </button>
+          <button type="button" id="checkout-button" class="btn del-button w-100 mt-2" onclick="submitCheckInTime('ออกงาน')">
+            <i class="fa-solid fa-circle-chevron-left"></i> ลงเวลาออก/CheckOut
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="levSelectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="levSelectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">👨‍⚕️ เลือกประเภทการลา</h5>
+          <button type="button" class="btn del-button" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="levSelectList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="RPTLModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RPTLModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class=" mt-2" style="color: var(--box3); font-weight: bold;">📝 แบบฟอร์มขออนุญาตลา</h5>
+          <button type="button" class="btn del-button" onclick="clearFormLeave();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="adduserLeave">
+        <input type="text" class="form-control" id="leaveDataKey" name="leaveDataKey" hidden>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <div class="mb-1">
+                <label class="control-label"> ประเภทลา <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="leaveData1" name="leaveData1" placeholder="กรุณากรอกประเภทลา" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <div class="mb-1">
+                <label class="control-label"> รายละเอียดการลา <span class="text-danger">*</span></label>
+                <textarea type="text" class="form-control " id="leaveData2" name="leaveData2" rows="3" placeholder="กรุณากรอกรายละเอียดการลาที่นี่"></textarea>
+            </div>
+          </div>
+        </div>
+      <div class="row mt-2">
+        <div class="col-md-12">
+          <div class="d-flex">
+            <div class="form-switch-wrapper me-2">
+              <input type="checkbox" class="styled-switch" id="morningHalfDaySwitch" onchange="toggleMorningHalfDayLeave()">
+              <label class="form-check-label" for="morningHalfDaySwitch">ครึ่งวันเช้า</label>
+            </div>
+            <div class="form-switch-wrapper me-2">
+              <input type="checkbox" class="styled-switch" id="afternoonHalfDaySwitch" onchange="toggleAfternoonHalfDayLeave()">
+              <label class="form-check-label" for="afternoonHalfDaySwitch">ครึ่งวันบ่าย</label>
+            </div>
+            <div class="form-switch-wrapper me-2">
+              <input type="checkbox" class="styled-switch" id="fullDaySwitch" onchange="toggleFullDayLeave()">
+              <label class="form-check-label" for="fullDaySwitch">เต็มวัน</label>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="row mt-2">
+          <div class="col-md-6">
+            <div class="mb-1">
+              <label class="control-label">ตั้งแต่วันที่ <span class="text-danger">*</span></label>
+              <input type="datetime-local" class="form-control" id="leaveData3" name="leaveData3" onchange="handleLeaveStartDateChange();">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-1">
+              <label class="control-label">ถึงวันที่ <span class="text-danger">*</span></label>
+              <input type="datetime-local" class="form-control" id="leaveData4" name="leaveData4" onchange="handleLeaveEndDateChange();">
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-6">
+            <div class="mb-1">
+              <label class="control-label">จำนวนวัน <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="leaveData5" name="leaveData5" placeholder="กรุณากรอกข้อมูล" readonly>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-1">
+              <label class="control-label">จำนวนชั่วโมง <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="leaveData6" name="leaveData6" placeholder="กรุณากรอกข้อมูล" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2" id="leaveData7Row" style="display: none;">
+          <div class="col-md-12">
+            <div class="mb-1">
+              <label class="control-label">อัปโหลดใบรับรองแพทย์ <span class="text-danger">*</span></label>
+              <input type="file" class="form-control" id="leaveData7" name="leaveData7">
+            </div>
+          </div>
+        </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormLeave()">ขออนุญาตลา</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="rqtBodyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="rqtBodyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class=" mt-2" style="color: var(--box3); font-weight: bold;">📝 ขอหนังสือรับรองเงินเดือน</h5>
+          <button type="button" class="btn del-button" onclick="clearFormreqList();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormreqList">
+        <input type="text" class="form-control" id="reqListDataKey" name="reqListDataKey" hidden>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <div class="mb-1">
+                <label class="control-label"> รายละเอียดการขอ <span class="text-danger">*</span></label>
+                <textarea type="text" class="form-control " id="reqListData1" name="reqListData1" rows="4" placeholder="ระบุวัตถุประสงค์ในการขอใช้หนังสือรับรองเงินเดือน"></textarea>
+            </div>
+          </div>
+        </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormreqList();">ยืนยันคำขอ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="leaveApprovalModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="leaveApprovalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">👨‍⚕️ รายการลางาน จำนวน <span id="leaveCount"></span> คน</h5>
+          <button type="button" class="btn del-button" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="approvalLeaveList" style="max-height: 500px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="requestApprovalModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="requestApprovalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">👨‍⚕️ รายการคำขอ จำนวน <span id="requestCount"></span> คน</h5>
+          <button type="button" class="btn del-button" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="approvalRequestList" style="max-height: 500px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="leaveApprovalRequestModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="leaveApprovalRequestLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class=" mt-2" style="color: var(--box3); font-weight: bold;">📝ขออนุญาตลางาน คุณอนุมัติหรือไม่?</h5>
+          <button type="button" class="btn del-button" onclick="closesetappLeave();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <hr>
+        <div class="row text-start mb-2">
+          <div class="col-6">
+            <p class="mb-1"><strong>ผู้ขออนุญาต</strong></p>
+            <small id="nameLeaveapproval"></small>
+          </div>
+          <div class="col-6">
+            <p class="mb-1"><strong>หน่วยงาน</strong></p>
+            <small id="dpmLeaveapproval"></small>
+          </div>
+        </div>
+        <div class="row text-start mb-2">
+          <div class="col-6">
+            <p class="mb-1"><strong>ประเภทการลา</strong></p>
+            <small id="leaveApproval1"></small>
+          </div>
+          <div class="col-6">
+            <p class="mb-1"><strong>รูปแบบการลา</strong></p>
+            <small id="leaveApproval2"></small>
+          </div>
+        </div>
+        <div class="row text-start">
+          <div class="col-6">
+            <p class="mb-1"><strong>ลาจากวันที่</strong></p>
+            <small id="leaveApproval3"></small><br>
+            <small id="leaveApproval4"></small>
+          </div>
+          <div class="col-6">
+            <p class="mb-1"><strong>จำนวนวัน</strong></p>
+            <small id="leaveApproval5"></small>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <div class="mb-1">
+              <select type="text" class="form-control"  id="approveDataLeave" name="approveDataLeave" style="color: var(--box1);"></select>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex mt-2">
+          <button type="button" class="btn del-button flex-fill me-2" onclick="submitApprovalLeave('ไม่อนุมัติ');"><i class="fa-solid fa-xmark"></i> ไม่อนุมัติ</button>
+          <button type="button" class="btn upload-button flex-fill" onclick="submitApprovalLeave('อนุมัติ');"><i class="fa-solid fa-check"></i> อนุมัติการลา</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reqApprovalRequestModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="reqApprovalRequestModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class=" mt-2" style="color: var(--box3); font-weight: bold;">📝ขอหนังสือรับรอง คุณอนุมัติหรือไม่?</h5>
+          <button type="button" class="btn del-button" onclick="closesetappRequest();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <hr>
+        <div class="row text-start mb-2">
+          <div class="col-6">
+            <p class="mb-1"><strong>ผู้ขออนุญาต</strong></p>
+            <small id="nameReqapproval"></small>
+          </div>
+          <div class="col-6">
+            <p class="mb-1"><strong>หน่วยงาน</strong></p>
+            <small id="dpmReqapproval"></small>
+          </div>
+        </div>
+        <div class="row text-start mb-2">
+          <div class="col-12">
+            <p class="mb-1"><strong>รายละเอียดคำขอ</strong></p>
+            <small id="ReqApproval1"></small>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <div class="mb-1">
+              <select type="text" class="form-control"  id="approveDataRequest" name="approveDataRequest" style="color: var(--box1);"></select>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex mt-2">
+          <button type="button" class="btn del-button flex-fill me-2" onclick="submitApprovalRequest('ไม่อนุมัติ');"><i class="fa-solid fa-xmark"></i> ไม่อนุมัติ</button>
+          <button type="button" class="btn upload-button flex-fill" onclick="submitApprovalRequest('อนุมัติ');"><i class="fa-solid fa-check"></i> อนุมัติ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
+
+<div class="modal fade" id="EmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-body p-4">
+        <h5 class="text-center mb-4 mt-2" style="color: var(--box3); font-weight: bold;">📝 ฟอร์มข้อมูลพนักงาน</h5>
+        <form>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <h5 style="color: var(--box1); font-weight: bold;">🙇 ข้อมูลส่วนตัวพนักงาน</h5>
+              <div class="d-flex align-items-center justify-content-center mb-2">
+                <label for="employeeImg" style="width: 250px; height: 250px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border: 3px solid white;" class="mb-3">
+                  <img id="employeePreview" src="https://img2.pic.in.th/pic/vsvds.png" alt="รูปประจำตัว" style="width: 100%; height: 100%; object-fit: cover;">
+                </label>
+                <input type="file" name="employeeImg" id="employeeImg" style="display:none">
+              </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">รหัสพนักงาน <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="empDataKey" name="empDataKey" placeholder="กรอกรหัสพนักงานที่นี่" readonly>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">ชื่อ นามสกุล <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="empData1" name="empData1" placeholder="กรอกชื่อ นามสกุลที่นี่">
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">เพศ <span class="text-danger">*</span></label>
+                  <select class="form-select" id="empData4" name="empData4">
+                    <option selected value="">กรุณาเลือกรายการ</option>
+                    <option value="ชาย">👨‍💼 ชาย</option>
+                    <option value="หญิง">👨‍💼 หญิง</option>
+                  </select>
+                </div>            
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">สัญชาติ <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="empData6" name="empData6" placeholder="กรอกสัญชาติที่นี่">
+                </div>     
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">สถานภาพ <span class="text-danger">*</span></label>
+                  <select class="form-select" id="empData7" name="empData7">
+                    <option selected value="">กรุณาเลือกรายการ</option>
+                    <option value="โสด">โสด</option>
+                    <option value="สมรส">สมรส</option>
+                    <option value="หย่า">หย่า</option>
+                    <option value="หม้าย">หม้าย</option>
+                    <option value="แยกกันอยู่">แยกกันอยู่</option>
+                  </select>
+                </div>          
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">พิการ/ทุพพลภาพ <span class="text-danger">*</span></label>
+                  <select class="form-select" id="empData8" name="empData8">
+                    <option selected value="">กรุณาเลือกรายการ</option>
+                    <option value="ปกติ">ปกติ</option>
+                    <option value="คนพิการทางการมองเห็น">คนพิการทางการมองเห็น</option>
+                    <option value="คนพิการทางการได้ยินหรือการสื่อความหมาย">คนพิการทางการได้ยินหรือการสื่อความหมาย</option>
+                    <option value="คนพิการทางกายหรือการเคลื่อนไหว">คนพิการทางกายหรือการเคลื่อนไหว</option>
+                    <option value="คนพิการทางจิตใจหรือพฤติกรรม">คนพิการทางจิตใจหรือพฤติกรรม</option>
+                    <option value="คนพิการทางสติปัญญาหรือการเรียนรู้">คนพิการทางสติปัญญาหรือการเรียนรู้</option>
+                  </select>
+                </div>         
+              </div>
+          
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">เลขบัตรประชาชน <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control" id="empData9" name="empData9" minlength="13" placeholder="กรอกเลขบัตรประชาชนที่นี่">
+                </div>        
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label">วัน/เดือน/ปี(เกิด) <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" id="empData5" name="empData5" placeholder="กรอกวันที่จ้างที่นี่">
+                </div>
+              </div>
+              
+            </div>
+          </div>
+
+            <div class="col-12 col-lg-4">
+              <h5 style="color: var(--box1); font-weight: bold;">🌏 ข้อมูลการติดต่อ</h5>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-2">
+                    <label class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" id="empData12" name="empData12" minlength="10" placeholder="กรอกที่อยู่ที่นี่">
+                  </div>              
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">อีเมล <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="empData13" name="empData13" placeholder="กรอกอีเมลที่นี่">
+                  </div>         
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">Line ID <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="empData14" name="empData14" placeholder="กรอก Line IDที่นี่">
+                  </div>            
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" id="empData15" name="empData15" minlength="10" placeholder="กรอกเบอร์โทรศัพท์ที่นี่">
+                  </div>                
+                </div>
+              </div>
+
+              <h5 class="mt-3" style="color: var(--box1); font-weight: bold;">👨‍💼 ข้อมูลการจ้าง</h5>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="control-label">ตำแหน่ง <span class="text-danger">*</span></label>
+                    <select class="form-select" id="empData2" name="empData2" required></select>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="control-label">แผนก <span class="text-danger">*</span></label>
+                    <select class="form-select" id="empData3" name="empData3" required></select>
+                  </div>         
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">การจ้างงาน <span class="text-danger">*</span></label>
+                    <select class="form-select" id="empData16" name="empData16">
+                      <option selected value="">กรุณาเลือกรายการ</option>
+                      <option value="พนักงานประจำ">👨‍💼 พนักงานประจำ</option>
+                      <option value="พนักงานรายวัน">👨‍💼 พนักงานรายวัน</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">วันที่จ้าง <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="empData17" name="empData17" placeholder="กรอกวันที่จ้างที่นี่">
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">การจ่าย <span class="text-danger">*</span></label>
+                    <select class="form-select" id="empData18" name="empData18">
+                      <option selected value="">กรุณาเลือกรายการ</option>
+                      <option value="รายเดือน">💵 รายเดือน</option>
+                      <option value="รายวัน">💵 รายวัน</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">ค่าจ้าง <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="empData19" name="empData19" placeholder="กรอกค่าจ้างที่นี่">
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="form-label">เงินพิเศษ <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="empData20" name="empData20" placeholder="กรอกเงินพิเศษที่นี่">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <h5 style="color: var(--box1); font-weight: bold;">👨‍💼 สิทธิ์ประกันสังคม</h5>
+              <div class="mb-2">
+                <label class="form-label">เลขประกันสังคม <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="empData10" name="empData10" minlength="13" placeholder="กรอกเลขประกันสังคมที่นี่">
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <div class="card Employee-card" id="cardCheckDataA" onclick="selectEmpCard('cardCheckDataA', 'empData11')">
+                    <div class="card-body">
+                      <input type="radio" name="empData11" id="radioCheckDataA" value="ขึ้นสิทธิ์ประกันสังคม" checked style="display:none;">
+                      <h6 class="card-title" style="color: var(--box1)">✔️ มีสิทธิ์</h6>
+                      <p class="card-text" style="color: var(--box3); font-size: 14px;">ขึ้นสิทธิ์ประกันสังคม</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card Employee-card" id="cardCheckDataB" onclick="selectEmpCard('cardCheckDataB', 'empData11')">
+                    <div class="card-body">
+                      <input type="radio" name="empData11" id="radioCheckDataB" value="ไม่ขึ้นสิทธิ์ประกันสังคม" style="display:none;">
+                      <h6 class="card-title" style="color: var(--box1)">❌ ไม่มีสิทธิ์</h6>
+                      <p class="card-text" style="color: var(--box3); font-size: 14px;">ไม่ขึ้นสิทธิ์ประกันสังคม</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h5 class="mt-3" style="color: var(--box1); font-weight: bold;">💳 ข้อมูลการชำระเงินเดือน/ค่าจ้าง</h5>
+              <div class="row">
+                <div class="col-6">
+                  <div class="mb-2">
+                    <label class="form-label">ช่องทางการชำระ <span class="text-danger">*</span></label>
+                    <select class="form-select" id="empData21" name="empData21">
+                      <option selected value="">กรุณาเลือกรายการ</option>
+                      <option value="โอนเงิน">💳 โอนเงิน</option>
+                      <option value="เงินสด">💵 เงินสด</option>
+                      <option value="เช็ค">💸 เช็ค</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div class="mb-2">
+                    <label class="form-label">ธนาคาร <span class="text-danger">*</span></label>
+                    <select class="form-select" id="empData22" name="empData22">
+                      <option selected value="">กรุณาเลือกรายการ</option>
+                      <option value="ธนาคารกรุงเทพ">💳 ธนาคารกรุงเทพ</option>
+                      <option value="ธนาคารกสิกรไทย">💳 ธนาคารกสิกรไทย</option>
+                      <option value="ธนาคารกรุงไทย">💳 ธนาคารกรุงไทย</option>
+                      <option value="ธนาคารทหารไทย">💳 ธนาคารทหารไทย</option>
+                      <option value="ธนาคารไทยพาณิชย์">💳 ธนาคารไทยพาณิชย์</option>
+                      <option value="ธนาคารกรุงศรีอยุธยา">💳 ธนาคารกรุงศรีอยุธยา</option>
+                      <option value="ธนาคารเกียรตินาคิน">💳 ธนาคารเกียรตินาคิน</option>
+                      <option value="ธนาคารซีไอเอ็มบีไทย">💳 ธนาคารซีไอเอ็มบีไทย</option>
+                      <option value="ธนาคารทิสโก้">💳 ธนาคารทิสโก้</option>
+                      <option value="ธนาคารธนชาต">💳 ธนาคารธนชาต</option>
+                      <option value="ธนาคารยูโอบี">💳 ธนาคารยูโอบี</option>
+                      <option value="ธนาคารไอซีบีซี(ไทย)">💳 ธนาคารไอซีบีซี(ไทย)</option>
+                      <option value="ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร">💳 ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร</option>
+                      <option value="ธนาคารออมสิน">💳 ธนาคารออมสิน</option>                  
+                      <option value="ธนาคารอาคารสงเคราะห์">💳 ธนาคารอาคารสงเคราะห์</option>
+                      <option value="ธนาคารอิสลามแห่งประเทศไทย">💳 ธนาคารอิสลามแห่งประเทศไทย</option>
+                      <option value="ธนาคารไทยเครดิตเพื่อรายย่อย">💳 ธนาคารไทยเครดิตเพื่อรายย่อย</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div class="mb-2">
+                    <label class="form-label">เลขบัญชีธนาคาร <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="empData23" name="empData23" placeholder="กรอกเลขบัญชีที่นี่">
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div class="mb-2">
+                    <label class="form-label">สาขาธนาคาร <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="empData25" name="empData25" placeholder="กรอกสาขาธนาคารที่นี่">
+                  </div>            
+                </div>
+
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="card Employee-card" id="cardCheckDataC" onclick="selectEmpCard('cardCheckDataC', 'empData24')">
+                        <div class="card-body">
+                          <input type="radio" name="empData24" id="radioCheckDataC" value="บัญชีออมทรัพย์" checked style="display:none;">
+                          <h6 class="card-title" style="color: var(--box1)">💳 บัญชีออมทรัพย์</h6>
+                          <p class="card-text" style="color: var(--box3); font-size: 14px;">เหมาะสำหรับการออมเงิน</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="card Employee-card" id="cardCheckDataD" onclick="selectEmpCard('cardCheckDataD', 'empData24')">
+                        <div class="card-body">
+                          <input type="radio" name="empData24" id="radioCheckDataD" value="บัญชีกระแสรายวัน" style="display:none;">
+                          <h6 class="card-title" style="color: var(--box1)">💳 บัญชีกระแสรายวัน</h6>
+                          <p class="card-text" style="color: var(--box3); font-size: 14px;">เหมาะสำหรับการโอนเงิน</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn set-button me-2" onclick="submitDataEmployee()">บันทึกข้อมูล</button>
+        <button type="button" class="btn del-button" onclick="clearDataEmployee()">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="holidayModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="holidayModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">📅 วันหยุด <span id="totalHolidays"></span> วัน</h5>
+          <select id="selectYearModal" class="form-select" style="width: 100px;"></select>
+          <button type="button" class="btn del-button" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="holidayList" style="max-height: 500px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setLocationsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setLocationsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🌏 Locations/สถานที่</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetLocations();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormSetLocations">
+          <input type="text" class="form-control" id="dataSetLocationsKey" name="dataSetLocationsKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> สถานที่ <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetLocations1" name="dataSetLocations1" placeholder="กรุณากรอกสถานที่">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> ที่อยู่ <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetLocations2" name="dataSetLocations2" placeholder="กรุณากรอกที่อยู่">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> เมือง <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetLocations3" name="dataSetLocations3" placeholder="กรุณากรอกเมือง">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                <input type="number" class="form-control " id="dataSetLocations4" name="dataSetLocations4" placeholder="กรุณากรอกรหัสไปรษณีย์">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> พิกัดละติจูด <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetLocations5" name="dataSetLocations5" placeholder="กรุณากรอกพิกัดละติจูด">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> พิกัดลองจิจูด <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetLocations6" name="dataSetLocations6" placeholder="กรุณากรอกพิกัดลองจิจูด">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetLocations()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setTimeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setTimeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🕒 Time/เวลาทำงาน</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetTime();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormSetTime">
+          <input type="text" class="form-control" id="dataSetTimeKey" name="dataSetTimeKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> เวลาเข้างาน <span class="text-danger">*</span></label>
+                <input type="time" class="form-control " id="dataSetTime1" name="dataSetTime1" placeholder="กรุณากรอกเวลาเข้างาน">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> เวลาออกงาน <span class="text-danger">*</span></label>
+                <input type="time" class="form-control " id="dataSetTime2" name="dataSetTime2" placeholder="กรุณากรอกเวลาออกงาน">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetTime()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setLeaveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setLeaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">😷 Leave/ประเภทลา</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetLeave();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormSetLeave">
+          <input type="text" class="form-control" id="dataSetLeaveKey" name="dataSetLeaveKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> ประเภท <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetLeave1" name="dataSetLeave1" placeholder="กรุณากรอกประเภท">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> จำนวนวัน <span class="text-danger">*</span></label>
+                <input type="number" class="form-control " id="dataSetLeave2" name="dataSetLeave2" placeholder="กรุณากรอกจำนวนวัน">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetLeave()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setOTModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setOTModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🕒 OT/โอที</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetOT();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormSetOT">
+          <input type="text" class="form-control" id="dataSetOTKey" name="dataSetOTKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> เปอร์เซ็น <span class="text-danger">*</span></label>
+                <input type="number" class="form-control " id="dataSetOT1" name="dataSetOT1" placeholder="กรุณากรอกเปอร์เซ็น">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetOT()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setDayOffModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setDayOffModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🗓️ DayOff/วันหยุดพิเศษ</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetDayOff();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormSetDayOff">
+          <input type="text" class="form-control" id="dataSetDayOffKey" name="dataSetDayOffKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> วันหยุด <span class="text-danger">*</span></label>
+                <input type="date" class="form-control " id="dataSetDayOff1" name="dataSetDayOff1">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> รายละเอียด <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetDayOff2" name="dataSetDayOff2" placeholder="กรุณากรอกรายละเอียด">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetDayOff()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setWeekEndModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setWeekEndModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">📅 WeekEnd/วันทำงาน</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSettWeekEnd();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormWeekEnd">
+          <input type="text" class="form-control" id="dataSettWeekEndKey" name="dataSettWeekEndKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> วันทำงาน <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSettWeekEnd1" name="dataSettWeekEnd1" placeholder="กรุณากรอกรายละเอียด">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetWeekEnd()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setSalaryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setSalaryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">💲 Salary/เงินเดือน</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetSalary();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormSalary">
+          <input type="text" class="form-control" id="dataSetSalaryKey" name="dataSetSalaryKey" hidden>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> ช่วงวันที่ <span class="text-danger">*</span></label>
+                <input type="date" class="form-control " id="dataSetSalary1" name="dataSetSalary1">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-1">
+                <label class="control-label"> ถึงวันที่ <span class="text-danger">*</span></label>
+                <input type="date" class="form-control " id="dataSetSalary2" name="dataSetSalary2" >
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> งวดที่ <span class="text-danger">*</span></label>
+                <input type="number" class="form-control " id="dataSetSalary3" name="dataSetSalary3">
+              </div>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetSalary()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setBankModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setBankModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-5">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h5 class="text-center mt-2" style="color: var(--box3); font-weight: bold;">🏦 Bank/ธนาคารนำส่ง</h5>
+          <button type="button" class="btn del-button" onclick="clearFormSetBank();">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="addFormBank">
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="d-flex align-items-center justify-content-center">
+                  <div style="width: 150px; height: 150px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border:3px solid white;" class="mb-3">
+                    <img id="regictorBankPreview" src="https://img2.pic.in.th/pic/vsvds.png" alt="รูปประจำตัว" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <input type="file" name="regictorBankImg" id="regictorBankImg" style="display:none">
+                </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> CodeID <span class="text-danger">*</span></label>
+                <input type="number" class="form-control " id="dataSetBankKey" name="dataSetBankKey" placeholder="กรุณากรอกCodeID">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> Bank Name (TH) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetBank1" name="dataSetBank1" placeholder="กรุณากรอกชื่อภาษาไทย">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <label class="control-label"> Bank Name (EN) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control " id="dataSetBank2" name="dataSetBank2" placeholder="กรุณากรอกชื่อภาษาอังกฤษ">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div class="mb-1">
+                <div id="reviewdivBankCode"></div>
+              </div>
+            </div>
+          </div>
+          
+        </form>
+        <button type="submit" class="btn set-button w-100 mt-2" onclick="submitFormSetBank()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
