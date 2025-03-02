@@ -1,0 +1,563 @@
+<div class="row g-3 mt-2">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">📝 การขอหนังสือรับรอง</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+          <select class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" onchange="updateItemsRequest(this.value)">
+            <option value="10">✅ 10</option>
+            <option value="20">✅ 25</option>
+            <option value="50">✅ 50</option>
+            <option value="100">✅ 100</option>
+            <option value="all">✅ ทั้งหมด</option>
+          </select>
+            <input type="search" class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" id="searchRequest" placeholder="🔍ค้นหาข้อมูล..." oninput="filterRequest()">
+            <button type="button" class="btn upload-button" id="reqList-button" onclick="openRequestApprovalModal()" style="display:none"><i class="fa-solid fa-pen-to-square"></i> อนุมัติคำขอ <span class="badge del-button" id="countingRequest">0</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">ชื่อพนักงาน</th>
+                <th scope="col" class="text-center">รายละเอียด</th>
+                <th scope="col" class="text-center">ผู้ตรวจสอบ</th>
+                <th scope="col" class="text-center">สถานะ</th>
+                <th scope="col" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tablereqListTblBody">
+              <tr>
+                <td colspan='6' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>
+              </tr>
+            </tbody>       
+          </table>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0 align-items-center" id="paginationRequestInfo"></div>
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div id="paginationRequest" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let filteredRequest = [];
+let currentRequest = 1;
+let itemsPerRequest = 10;
+
+const renderDataRequest = (res) => {
+  const table = document.getElementById('tablereqListTblBody');
+  table.innerHTML = '';
+
+  const uidMember = localStorage.getItem('uiduser');
+  const userLevel = localStorage.getItem('level');
+
+  if (userLevel === 'SuperAdmin' || userLevel === 'Admin') {
+    filteredRequest = res;
+  } else {
+    filteredRequest = res.filter(row => row[3] === uidMember);
+  }
+
+  filteredRequest.sort((a, b) => {
+    if (a[1] === 'รอตรวจสอบ' && b[1] !== 'รอตรวจสอบ') return -1;
+    if (a[1] !== 'รอตรวจสอบ' && b[1] === 'รอตรวจสอบ') return 1;
+
+    const numA = parseInt(a[0].replace('REQ', ''));
+    const numB = parseInt(b[0].replace('REQ', ''));
+    return numB - numA;
+  });
+
+  const startIndex = (currentRequest - 1) * itemsPerRequest;
+  const endIndex = startIndex + itemsPerRequest;
+  const req = filteredRequest.slice(startIndex, endIndex);
+
+  const startRow = startIndex + 1;
+  const endRow = startIndex + req.length;
+  const totalRows = filteredRequest.length;
+
+  document.getElementById('paginationRequestInfo').innerText = `แสดง ${startRow} ถึง ${endRow} จาก ${totalRows} แถว`;
+
+  if (req.length === 0) {
+    const row = table.insertRow();
+    row.innerHTML = `<td colspan='6' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>`;
+    return;
+  }
+
+  req.forEach((rowIndex, index) => {
+    const checkrowIndex = [rowIndex[9], rowIndex[10], rowIndex[11], rowIndex[12]];
+    const filledFields = checkrowIndex.filter(field => field && field.trim() !== '').length;
+    const progressbar = Math.round((filledFields / checkrowIndex.length) * 100);
+    const progressAngle = progressbar * 3.6;
+
+    let progressColor;
+    let buttonClass = 'upload-button';
+    if (progressbar <= 25) {
+      progressColor = 'var(--box4)';
+      buttonClass = 'del-button';
+    } else if (progressbar <= 50) {
+      progressColor = 'var(--box3)';
+      buttonClass = 'edit-button';
+    } else if (progressbar <= 75) {
+      progressColor = 'var(--box1)';
+      buttonClass = 'set-button';
+    } else {
+      progressColor = 'var(--box2)';
+      buttonClass = 'upload-button';
+    }
+
+    let menuRequestItem;
+    if (rowIndex[1] === 'อนุมัติ') {
+      menuRequestItem = `<li><a class="dropdown-item hover-highlight" onclick="sendRequest('${rowIndex[0]}')"><i class="fa-regular fa-paper-plane"></i> หนังสือรับรอง</a></li>`;
+    } else {
+      menuRequestItem = `<li><a class="dropdown-item hover-highlight disabled"><i class="fa-regular fa-circle-xmark"></i> ไม่พบหนังสือรับรอง</a></li>`;
+    }
+
+    let user = dataUsers && dataUsers.find(user => user[0] === rowIndex[3]);
+    let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+
+    var row = table.insertRow();
+    row.innerHTML = `
+    <td class="text-center"><span style="font-size: 14px;">${startIndex + index + 1}</span></td>
+    <td>
+      <div style="display: flex; align-items: center;">
+        <img class="rounded-circle" src="${userImage ? userImage : '❌ N/A'}" alt="ImageUsers" width="40" style="margin-right: 10px;">
+        <div style="font-size: 14px;">
+          <span>ชื่อ สกุล: ${rowIndex[4] ? rowIndex[4] : '❌ N/A'}</span><br>
+          <span>ตำแหน่ง: ${rowIndex[5] ? rowIndex[5] : '❌ N/A'}</span><br>
+          <span>แผนก: ${rowIndex[6] ? rowIndex[6] : '❌ N/A'}</span>
+        </div>
+      </div>
+    </td>
+    <td>
+      <span style="font-size: 14px;">${rowIndex[8] ? rowIndex[8] : '❌ N/A'}</span>
+    </td>
+    <td>
+      <span style="font-size: 14px;">ผู้อนุมัติ: ${rowIndex[9] ? rowIndex[9] : '❌ N/A'}</span><br>
+      <span style="font-size: 14px;">ความเห็น: ${rowIndex[10] ? rowIndex[10] : '❌ N/A'} วันที่: ${rowIndex[11] ? rowIndex[11] : '❌ N/A'}</span>
+    </td>
+    <td class="text-center" style="vertical-align: middle;">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <div class="circular-progress" style="--progress-color: ${progressColor}; --progress-angle: ${progressAngle}deg;">
+          <span class="progress-value">${progressbar}%</span>
+        </div>
+      </div>
+    </td>
+    <td class="text-center" style="vertical-align: middle;">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <select class="form-control me-2" style="font-size: 14px; width: auto;" disabled>
+          <option value="รอตรวจสอบ" ${rowIndex[1] === 'รอตรวจสอบ' ? 'selected' : ''}>⌛ รอตรวจสอบ</option>
+          <option value="ไม่อนุมัติ" ${rowIndex[1] === 'ไม่อนุมัติ' ? 'selected' : ''}>❌ ไม่อนุมัติ</option>
+          <option value="ยกเลิก" ${rowIndex[1] === 'ยกเลิก' ? 'selected' : ''}>❌ ยกเลิก</option>
+          <option value="อนุมัติ" ${rowIndex[1] === 'อนุมัติ' ? 'selected' : ''}>✅ อนุมัติ</option>
+        </select>
+        <div class="dropdown">
+          <button class="btn btn-sm del-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item hover-highlight" onclick="editRequest('${rowIndex[0]}')"><i class="fa-solid fa-pen-to-square"></i> แก้ไขรายการ</a></li>
+            <li><a class="dropdown-item hover-highlight" onclick="delRequest('${rowIndex[0]}')"><i class="fa-solid fa-trash-can"></i> ลบรายการ</a></li>
+            ${menuRequestItem}
+          </ul>
+        </div>
+      </div>
+    </td>
+    `;
+  });
+}
+
+const renderPageDataRequest = () => {
+  const totalItems = filteredRequest.length;
+  const totalPages = Math.ceil(totalItems / itemsPerRequest);
+  const paginationContainer = document.getElementById('paginationRequest');
+  paginationContainer.innerHTML = '';
+
+  if (totalPages > 1) {
+    const createPageButton = (text, page, isDisabled = false, isActive = false) => {
+      const li = document.createElement('li');
+      li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+      const button = document.createElement('button');
+      button.className = 'page-link';
+      button.innerText = text;
+      button.onclick = () => {
+        if (!isDisabled) {
+          currentRequest = page;
+          renderDataRequest(filteredRequest);
+          renderPageDataRequest();
+        }
+      };
+      li.appendChild(button);
+      return li;
+    };
+
+    paginationContainer.appendChild(createPageButton('ย้อนกลับ', currentRequest - 1, currentRequest === 1));
+
+    if (currentRequest > 2) {
+      paginationContainer.appendChild(createPageButton(1, 1, false, currentRequest === 1));
+      if (currentRequest > 3) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+    }
+
+    paginationContainer.appendChild(createPageButton(currentRequest, currentRequest, false, true));
+
+    if (currentRequest < totalPages - 1) {
+      if (currentRequest < totalPages - 2) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+      paginationContainer.appendChild(createPageButton(totalPages, totalPages, false, currentRequest === totalPages));
+    }
+    paginationContainer.appendChild(createPageButton('ถัดไป', currentRequest + 1, currentRequest === totalPages));
+  }
+}
+
+const filterRequest = () => {
+  const query = document.getElementById('searchRequest').value.toLowerCase();
+  const uidMember = localStorage.getItem('uiduser');
+  const userLevel = localStorage.getItem('level');
+
+  if (userLevel === 'SuperAdmin' || userLevel === 'Admin') {
+    filteredRequest = allRequest.filter(row => row.some(column => column.toLowerCase().includes(query)));
+  } else {
+    filteredRequest = allRequest.filter(row => row[3] === uidMember && row.some(column => column.toLowerCase().includes(query)));
+  }
+
+  currentRequest = 1;
+  renderDataRequest(filteredRequest);
+  renderPageDataRequest();
+}
+
+const updateItemsRequest = (value) => {
+  if (value === "all") {
+    itemsPerRequest = filteredRequest.length;
+  } else {
+    itemsPerRequest = parseInt(value, 10);
+  }
+
+  currentRequest = 1;
+  renderDataRequest(filteredRequest);
+  renderPageDataRequest();
+}
+
+const updateCountsRequest = (data) => {
+  const countingRequest = data.filter(row => row[1] === "รอตรวจสอบ").length;
+  document.getElementById('countingRequest').innerText = countingRequest;
+}
+
+const submitFormreqList = () => {
+  event.preventDefault();
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+
+  const obj = {
+    rqtKey: document.getElementById('reqListDataKey').value,
+    rqtuid: document.getElementById('user-show0').innerText,
+    rqtfullname: document.getElementById('user-show1').innerText,
+    rqtdpm: document.getElementById('user-show2').innerText,
+    rqtgroup: document.getElementById('user-show5').innerText,
+    rqtsig: document.getElementById('user-show4').innerText,
+    rqtdata1: document.getElementById('reqListData1').value 
+  };
+
+  if (!obj.rqtuid || !obj.rqtfullname || !obj.rqtdpm || !obj.rqtgroup || !obj.rqtsig || !obj.rqtdata1) {
+    createToast("⚠️ กรุณากรอกข้อมูลให้ครบถ้วน", 3);
+    $.LoadingOverlay("hide");
+    return;
+  }
+
+  if (!obj.rqtKey) {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      await updateSpecificRequestData();
+      clearFormreqList();
+      createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+    }).addDatareqList(obj);
+  } else {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      await updateSpecificRequestData();
+      clearFormreqList();
+      createToast("✅ แก้ไขข้อมูลสำเร็จ", 1);
+    }).upDatareqList(obj);
+  }
+};
+
+const editRequest = (codeID) => {
+  const userRole1 = localStorage.getItem('uiduser') || '';
+  const userRole2 = localStorage.getItem('level') || '';
+  const dataAllREQ = allRequest.find(row => row[0] === codeID);
+  
+  if (dataAllREQ) {
+    if (dataAllREQ[1] !== 'รอตรวจสอบ') {
+      createToast("⚠️ คำขอนี้ไม่สามารถแก้ไขได้", 3);
+      return;
+    }
+    if ((userRole2 !== 'SuperAdmin' && userRole2 !== 'Admin' && userRole1 !== dataAllREQ[3])) {
+      createToast("⚠️ คุณไม่มีสิทธิ์ในการเข้าถึงรายการนี้", 3);
+      return;
+    }
+
+    $('#rqtBodyModal').modal('show');
+    $('#reqListDataKey').val(dataAllREQ[0]);
+    $('#reqListData1').val(dataAllREQ[8]);
+  }
+};
+
+const delRequest = (codeID) => {
+  const userRole1 = localStorage.getItem('uiduser') || '';
+  const userRole2 = localStorage.getItem('level') || '';
+  let dataAllREQ = allRequest.find(row => row[0] === codeID);
+  if (dataAllREQ) {
+    if (dataAllREQ[1] !== 'รอตรวจสอบ') {
+      createToast("⚠️ คำขอนี้ไม่สามารถลบได้", 3);
+      return;
+    }
+    if ((userRole2 !== 'SuperAdmin' && userRole2 !== 'Admin' && userRole1 !== dataAllREQ[3])) {
+      createToast("⚠️ คุณไม่มีสิทธิ์ในการเข้าถึงรายการนี้", 3);
+      return;
+    }
+    $('#confirmBtnDel').off('click').on('click', function() {
+      $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+      $('#DelDataModal').modal('hide');
+      google.script.run.withSuccessHandler(async (res) => {
+        dataAllREQ = allRequest.filter(row => row[0] !== codeID);
+        $.LoadingOverlay("hide");
+        await updateSpecificRequestData();
+        clearFormreqList();
+        createToast("⛔ ลบข้อมูลสำเร็จ", 0);
+      }).delDatareqList(codeID);
+    });
+    $('#xDelconfirmData').off('click').on('click', function() {
+      $('#DelDataModal').modal('hide');
+    });
+    $('#DelDataModal').modal('show');
+  }
+}
+
+const clearFormreqList = () => {
+  document.getElementById('reqListDataKey').value = '';
+  document.getElementById('reqListData1').value = '';
+
+  $('#rqtBodyModal').modal('hide');
+};
+
+const submitApprovalRequest = (status) => {
+  const reqdata = document.getElementById('approveDataRequest').value;
+  const fullname = document.getElementById('user-show1').innerText;
+  const signame = document.getElementById('user-show4').innerText;
+  if (!reqdata || !fullname || !signame) {
+    createToast("❌ กรุณากรอกข้อมูลให้ครบถ้วน", 0);
+    return;
+  }
+  const data = {
+    codeID: selectedAllRequest[0],
+    reqdata: reqdata,
+    fullname: fullname,
+    signame: signame,
+    status: status
+  };
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+  google.script.run.withSuccessHandler(async (res) => {
+  $.LoadingOverlay("hide");
+    $('#reqApprovalRequestModal').modal('hide');
+    document.getElementById('approveDataRequest').value = '';
+    await updateSpecificRequestData();
+    createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+  }).approvalRequest(data);
+}
+
+const sendRequest = (codeID) => {
+  const data = allRequest.find(row => row[0] === codeID);
+  if (!data) {
+    createToast("❌ ไม่พบข้อมูล", 0);
+    return;
+  }
+
+  const user = dataUsers.find(user => user[0] === data[3]);
+  if (!user) {
+    createToast("❌ ไม่พบข้อมูลพนักงาน", 0);
+    return;
+  }
+
+  // แปลงตัวเลขเป็นคำอ่านภาษาไทย
+  const numberToThaiBaht = (number) => {
+    const digits = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+    const positions = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+    
+    let numberStr = Math.floor(number).toString();
+    let decimals = ((number % 1) || 0).toFixed(2).substring(2);
+    
+    const readNumber = (num) => {
+      let word = '';
+      const length = num.length;
+
+      for (let i = 0; i < length; i++) {
+        const digit = parseInt(num[i]);
+        const position = length - i - 1;
+
+        if (digit !== 0) {
+          if (position === 1 && digit === 1) {
+            word += positions[position];
+          } else if (position === 1 && digit === 2) {
+            word += 'ยี่' + positions[position];
+          } else if (position === 0 && digit === 1 && length > 1) {
+            word += 'เอ็ด';
+          } else {
+            word += digits[digit] + positions[position];
+          }
+        }
+      }
+      return word;
+    };
+
+    let result = '';
+    
+    if (parseInt(numberStr) === 0) {
+      return 'ศูนย์บาทถ้วน';
+    }
+
+    while (numberStr.length > 6) {
+      const millions = numberStr.substring(0, numberStr.length - 6);
+      numberStr = numberStr.substring(numberStr.length - 6);
+      if (parseInt(millions) > 0) {
+        result += readNumber(millions) + 'ล้าน';
+      }
+    }
+
+    result += readNumber(numberStr);
+    result += 'บาท';
+
+    if (decimals === '00') {
+      result += 'ถ้วน';
+    } else {
+      const satang = parseInt(decimals);
+      if (satang > 0) {
+        result += readNumber(decimals.toString()) + 'สตางค์';
+      }
+    }
+
+    return result;
+  };
+
+  // แปลงวันที่เป็นภาษาไทย
+  const thaiMonths = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+  ];
+
+  const formatThaiDate = (dateStr) => {
+    const [day, month, year] = dateStr.split('/');
+    return {
+      date: parseInt(day),
+      month: thaiMonths[parseInt(month) - 1],
+      year: parseInt(year) + 543
+    };
+  };
+
+  const currentDate = formatThaiDate(data[11]);
+  const startDate = formatThaiDate(user[19]);
+  const salary = parseFloat(user[20].replace(',', '')).toFixed(2);
+  const salaryText = numberToThaiBaht(parseFloat(user[20].replace(',', '')));
+
+  Promise.all([
+    new Promise((resolve) => loadImagepdfmake(data[12], resolve))
+  ]).then(([signature]) => {
+    const docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [40, 30, 40, 30],
+      content: [
+        {
+          text: 'หนังสือรับรองเงินเดือน',
+          style: 'header',
+          alignment: 'center'
+        },
+        '\n',
+        {
+          text: `บริษัท นภัสโมบายล์ คอร์ปอเรชั่น จำกัด ขอรับรองว่า คุณ${data[4]} ได้ปฏิบัติงานในตำแหน่ง ${data[5]} ${data[6]} รหัสพนักงาน ${data[3]} ตั้งแต่วันที่ ${startDate.date} ${startDate.month} พ.ศ. ${startDate.year} จนถึงปัจจุบัน โดยมีอัตราเงินเดือนประจำเดือนละ ${salary} บาท (${salaryText}) ซึ่งอัตรานี้ไม่รวมค่าล่วงเวลาและเงินพิเศษอื่น ๆ`,
+          fontSize: 16,
+          alignment: 'justify',
+          leadingIndent: 40
+        },
+        '\n',
+        {
+          text: `เอกสารนี้ใช้เพื่อ ${data[8]} เท่านั้น`,
+          fontSize: 16,
+          alignment: 'justify',
+          margin: [40, 10, 40, 0]
+        },
+        '\n',
+        {
+          text: `ออกให้เมื่อวันที่ ${currentDate.date} ${currentDate.month} พ.ศ. ${currentDate.year}`,
+          fontSize: 16,
+          alignment: 'justify',
+          margin: [40, 10, 40, 0]
+        },
+        '\n',
+        {
+          columns: [
+            { width: '*', text: '' },
+            {
+              width: 'auto',
+              stack: [
+                {
+                  text: 'ลงชื่อ .................................................................', 
+                  fontSize: 16, 
+                  margin: [0, 10, 0, 0]
+                },
+                signature ? {
+                  image: signature,
+                  width: 60,
+                  alignment: 'center',
+                  margin: [0, -35, 0, -10]
+                } : {},
+                { 
+                  text: `(${data[9]})`,
+                  fontSize: 16,
+                  alignment: 'center',
+                  margin: [0, 10, 0, 0]
+                },
+                { 
+                  text: `ผู้บริหาร ${data[6]}`, 
+                  fontSize: 16,
+                  alignment: 'center',
+                  margin: [0, 5, 0, 0]
+                }
+              ],
+              alignment: 'right',
+              margin: [0, 0, 40, 0]
+            }
+          ]
+        }
+      ],
+      defaultStyle: {
+        font: 'THSarabunNew',
+        fontSize: 14
+      },
+      styles: {
+        header: {
+          fontSize: 20,
+          bold: true
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).open();
+  }).catch(error => {
+    console.error('Error:', error);
+    createToast("❌ เกิดข้อผิดพลาดในการสร้างเอกสาร", 0);
+  });
+};
+</script>
