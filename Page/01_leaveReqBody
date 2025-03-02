@@ -1,0 +1,957 @@
+<div class="row g-3 mt-2">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">📝 ข้อมูลการลาพนักงาน</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+            <select class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" onchange="updateItemsLeave(this.value)">
+            <option value="10">✅ 10</option>
+            <option value="20">✅ 25</option>
+            <option value="50">✅ 50</option>
+            <option value="100">✅ 100</option>
+            <option value="all">✅ ทั้งหมด</option>
+          </select>
+            <input type="search" class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" id="searchLeave" placeholder="🔍ค้นหาข้อมูล..." oninput="filterLeave()">
+            <button type="button" class="btn upload-button" id="appLev-button" onclick="openLeaveApprovalModal()" style="display:none"><i class="fa-solid fa-pen-to-square"></i> อนุมัติการลางาน <span class="badge del-button" id="countingLeave">0</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">ชื่อพนักงาน</th>
+                <th scope="col" class="text-center" style="width: 400px;">ประเภท</th>
+                <th scope="col" class="text-center">วันที่</th>
+                <th scope="col" class="text-center" style="width: 350px;">ผู้ตรวจสอบ</th>
+                <th scope="col" class="text-center">ไฟล์</th>
+                <th scope="col" class="text-center">สถานะ</th>
+                <th scope="col" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableLeave">
+              <tr>
+                <td colspan='8' class='fw-bold text-danger text-center p-4'>
+                  <i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0 align-items-center" id="paginationLeaveInfo"></div>
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div id="paginationLeave" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let filteredLeave = [];
+let currentLeave = 1;
+let itemsPerLeave = 10;
+
+const renderDataLeave = (res) => {
+  const table = document.getElementById('tableLeave');
+  table.innerHTML = '';
+
+  const uidMember = localStorage.getItem('uiduser');
+  const userLevel = localStorage.getItem('level');
+
+  if (userLevel === 'SuperAdmin' || userLevel === 'Admin') {
+    filteredLeave = res;
+  } else {
+    filteredLeave = res.filter(row => row[3] === uidMember);
+  }
+
+  filteredLeave.sort((a, b) => {
+    if (a[1] === 'รอตรวจสอบ' && b[1] !== 'รอตรวจสอบ') return -1;
+    if (a[1] !== 'รอตรวจสอบ' && b[1] === 'รอตรวจสอบ') return 1;
+
+    const numA = parseInt(a[0].replace('LEV', ''));
+    const numB = parseInt(b[0].replace('LEV', ''));
+    return numB - numA;
+  });
+
+  const startIndex = (currentLeave - 1) * itemsPerLeave;
+  const endIndex = startIndex + itemsPerLeave;
+  const lev = filteredLeave.slice(startIndex, endIndex);
+
+  const startRow = startIndex + 1;
+  const endRow = startIndex + lev.length;
+  const totalRows = filteredLeave.length;
+
+  document.getElementById('paginationLeaveInfo').innerText = `แสดง ${startRow} ถึง ${endRow} จาก ${totalRows} แถว`;
+
+  if (lev.length === 0) {
+    const row = table.insertRow();
+    row.innerHTML = `<td colspan='8' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>`;
+    return;
+  }
+
+  lev.forEach((rowIndex, index) => {
+    const checkrowIndex = [rowIndex[15], rowIndex[16], rowIndex[17], rowIndex[18]];
+    const filledFields = checkrowIndex.filter(field => field && field.trim() !== '').length;
+    const progressbar = Math.round((filledFields / checkrowIndex.length) * 100);
+    const progressAngle = progressbar * 3.6;
+
+    let progressColor;
+    let buttonClass = 'upload-button';
+    if (progressbar <= 25) {
+      progressColor = 'var(--box4)';
+      buttonClass = 'del-button';
+    } else if (progressbar <= 50) {
+      progressColor = 'var(--box3)';
+      buttonClass = 'edit-button';
+    } else if (progressbar <= 75) {
+      progressColor = 'var(--box1)';
+      buttonClass = 'set-button';
+    } else {
+      progressColor = 'var(--box2)';
+      buttonClass = 'upload-button';
+    }
+
+    let leaveMenuItem;
+    if (rowIndex[1] === 'อนุมัติ') {
+      leaveMenuItem = `<li><a class="dropdown-item hover-highlight" onclick="sendLeave('${rowIndex[0]}')"><i class="fa-regular fa-paper-plane"></i> อนุมัติใบลา</a></li>`;
+    } else {
+      leaveMenuItem = `<li><a class="dropdown-item hover-highlight" onclick="sendLeave('${rowIndex[0]}')"><i class="fa-regular fa-circle-xmark"></i> ไม่อนุมัติใบลา</a></li>`;
+    }
+
+    let statusImage;
+    if (rowIndex[10].trim() !== "") {
+      statusImage = `<a type="button" href="${rowIndex[10]}" target="_blank" class="btn btn-sm upload-button">✅ ใบรับรอง</a>`;
+    } else {
+      statusImage = `<a type="button" class="btn btn-sm del-button">❌ ไม่พบไฟล์</a>`;
+    }
+
+    let imgLeaveTypes = '';
+    switch (rowIndex[8]) {
+      case 'ลาป่วยมีใบรับรองแพทย์':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/bed-leave.png';
+        break;
+      case 'ลาป่วยไม่มีใบรับรองแพทย์':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/fever-leave.png';
+        break;
+      case 'ลากิจจำเป็น':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/leave.png';
+        break;
+      case 'ลากิจทั่วไป':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/training-leave.png';
+        break;
+      case 'ลาพักร้อน':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/beach-chair-leave.png';
+        break;
+      case 'ลาบวช':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/monk-leave.png';
+        break;
+      case 'ลาคลอด':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/mother-leave.png';
+        break;
+      case 'ลารับราชการทหาร':
+        imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/soldier-leave.png';
+        break;
+      default:
+        imgLeaveTypes = 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+    }
+
+    let user = dataUsers && dataUsers.find(user => user[0] === rowIndex[3]);
+    let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+
+    var row = table.insertRow();
+    row.innerHTML = `
+    <td class="text-center"><span style="font-size: 14px;">${startIndex + index + 1}</span></td>
+    <td>
+      <div style="display: flex; align-items: center;">
+        <img class="rounded-circle" src="${userImage ? userImage : '❌ N/A'}" alt="ImageUsers" width="40" style="margin-right: 10px;">
+        <div style="font-size: 14px;">
+          <span>ชื่อ สกุล: ${rowIndex[4] ? rowIndex[4] : '❌ N/A'}</span><br>
+          <span>ตำแหน่ง: ${rowIndex[5] ? rowIndex[5] : '❌ N/A'}</span><br>
+          <span>แผนก: ${rowIndex[6] ? rowIndex[6] : '❌ N/A'}</span>
+        </div>
+      </div>
+    </td>
+    <td>
+      <div style="display: flex; align-items: center;">
+        <img class="rounded-circle" src="${imgLeaveTypes ? imgLeaveTypes : '❌ N/A'}" alt="ImageUsers" width="40" style="margin-right: 10px;">
+        <div style="font-size: 14px;">
+          <span>การลางาน: ${rowIndex[8] ? rowIndex[8] : '❌ N/A'}</span><br>
+          <span>รายละเอียด: ${rowIndex[9] ? rowIndex[9] : '❌ N/A'}</span>
+        </div>
+      </div>
+    </td>
+    <td>
+      <span style="font-size: 14px;">วันที่เริ่มต้น: ${rowIndex[11] ? rowIndex[11] : '❌ N/A'}</span><br>
+      <span style="font-size: 14px;">วันที่สิ้นสุด: ${rowIndex[12] ? rowIndex[12] : '❌ N/A'}</span>
+    </td>
+    <td>
+      <span style="font-size: 14px;">ผู้อนุมัติ: ${rowIndex[15] ? rowIndex[15] : '❌ N/A'}</span><br>
+      <span style="font-size: 14px;">ความเห็น: ${rowIndex[16] ? rowIndex[16] : '❌ N/A'} วันที่: ${rowIndex[17] ? rowIndex[17] : '❌ N/A'}</span>
+    </td>
+    <td class="text-center" style="vertical-align: middle;">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 14px;">${statusImage}</span>
+      </div>
+    </td>
+    <td class="text-center" style="vertical-align: middle;">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <div class="circular-progress" style="--progress-color: ${progressColor}; --progress-angle: ${progressAngle}deg;">
+          <span class="progress-value">${progressbar}%</span>
+        </div>
+      </div>
+    </td>
+    <td class="text-center" style="vertical-align: middle;">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <select class="form-control me-2" style="font-size: 14px; width: auto;" disabled>
+          <option value="รอตรวจสอบ" ${rowIndex[1] === 'รอตรวจสอบ' ? 'selected' : ''}>⌛ รอตรวจสอบ</option>
+          <option value="ไม่อนุมัติ" ${rowIndex[1] === 'ไม่อนุมัติ' ? 'selected' : ''}>❌ ไม่อนุมัติ</option>
+          <option value="ยกเลิก" ${rowIndex[1] === 'ยกเลิก' ? 'selected' : ''}>❌ ยกเลิก</option>
+          <option value="อนุมัติ" ${rowIndex[1] === 'อนุมัติ' ? 'selected' : ''}>✅ อนุมัติ</option>
+        </select>
+        <div class="dropdown">
+          <button class="btn btn-sm del-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item hover-highlight" onclick="editLeave('${rowIndex[0]}')"><i class="fa-solid fa-pen-to-square"></i> แก้ไขรายการ</a></li>
+            <li><a class="dropdown-item hover-highlight" onclick="delLeave('${rowIndex[0]}')"><i class="fa-solid fa-trash-can"></i> ลบรายการ</a></li>
+            ${leaveMenuItem}
+          </ul>
+        </div>
+      </div>
+    </td>
+    `;
+  });
+}
+
+const renderPageDataLeave = () => {
+  const totalItems = filteredLeave.length;
+  const totalPages = Math.ceil(totalItems / itemsPerLeave);
+  const paginationContainer = document.getElementById('paginationLeave');
+  paginationContainer.innerHTML = '';
+
+  if (totalPages > 1) {
+    const createPageButton = (text, page, isDisabled = false, isActive = false) => {
+      const li = document.createElement('li');
+      li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+      const button = document.createElement('button');
+      button.className = 'page-link';
+      button.innerText = text;
+      button.onclick = () => {
+        if (!isDisabled) {
+          currentLeave = page;
+          renderDataLeave(filteredLeave);
+          renderPageDataLeave();
+        }
+      };
+      li.appendChild(button);
+      return li;
+    };
+
+    paginationContainer.appendChild(createPageButton('ย้อนกลับ', currentLeave - 1, currentLeave === 1));
+
+    if (currentLeave > 2) {
+      paginationContainer.appendChild(createPageButton(1, 1, false, currentLeave === 1));
+      if (currentLeave > 3) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+    }
+
+    paginationContainer.appendChild(createPageButton(currentLeave, currentLeave, false, true));
+
+    if (currentLeave < totalPages - 1) {
+      if (currentLeave < totalPages - 2) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+      paginationContainer.appendChild(createPageButton(totalPages, totalPages, false, currentLeave === totalPages));
+    }
+    paginationContainer.appendChild(createPageButton('ถัดไป', currentLeave + 1, currentLeave === totalPages));
+  }
+}
+
+const filterLeave = () => {
+  const query = document.getElementById('searchLeave').value.toLowerCase();
+  const uidMember = localStorage.getItem('uiduser');
+  const userLevel = localStorage.getItem('level');
+
+  if (userLevel === 'SuperAdmin' || userLevel === 'Admin') {
+    filteredLeave = allleave.filter(row => row.some(column => column.toLowerCase().includes(query)));
+  } else {
+    filteredLeave = allleave.filter(row => row[3] === uidMember && row.some(column => column.toLowerCase().includes(query)));
+  }
+
+  currentLeave = 1;
+  renderDataLeave(filteredLeave);
+  renderPageDataLeave();
+}
+
+const updateItemsLeave = (value) => {
+  if (value === "all") {
+    itemsPerLeave = filteredLeave.length;
+  } else {
+    itemsPerLeave = parseInt(value, 10);
+  }
+
+  currentLeave = 1;
+  renderDataLeave(filteredLeave);
+  renderPageDataLeave();
+}
+
+const updateCountsLeave = (data) => {
+  const countingLeave = data.filter(row => row[1] === "รอตรวจสอบ").length;
+  document.getElementById('countingLeave').innerText = countingLeave;
+}
+
+const handleLeaveStartDateChange = () => {
+  const leaveEndDate = document.getElementById('leaveData4');
+  leaveEndDate.value = '';
+  calculateLeave();
+};
+
+const handleLeaveEndDateChange = () => {
+  const fullDaySwitch = document.getElementById('fullDaySwitch');
+  if (fullDaySwitch && fullDaySwitch.checked) {
+    calculateLeave();
+  }
+};
+
+const setMinDateLeave = () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('leaveData3').setAttribute('min', today);
+  document.getElementById('leaveData4').setAttribute('min', today);
+};
+
+const toggleFullDayLeave = () => { 
+  const fullDaySwitch = document.getElementById('fullDaySwitch');
+  const morningSwitch = document.getElementById('morningHalfDaySwitch');
+  const afternoonSwitch = document.getElementById('afternoonHalfDaySwitch');
+  const levStartDate = document.getElementById('leaveData3').value;
+
+  if (fullDaySwitch.checked) {
+    morningSwitch.checked = false;
+    afternoonSwitch.checked = false;
+    if (!levStartDate) {
+      createToast("⚠️ เกิดข้อผิดพลาด กรุณาเลือกวันที่เริ่มต้น", 3);
+      fullDaySwitch.checked = false;
+      return;
+    }
+    const startDate = new Date(levStartDate);
+
+    document.getElementById('leaveData3').value = startDate.toISOString().split('T')[0] + "T00:00";
+
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+    document.getElementById('leaveData4').value = endDate.toISOString().split('T')[0] + "T00:00";
+  } else {
+    document.getElementById('leaveData4').value = '';
+  }
+  calculateLeave();
+};
+
+const toggleMorningHalfDayLeave = () => {
+  const morningSwitch = document.getElementById('morningHalfDaySwitch');
+  const afternoonSwitch = document.getElementById('afternoonHalfDaySwitch');
+  const fullDaySwitch = document.getElementById('fullDaySwitch');
+  const levStartDate = document.getElementById('leaveData3').value;
+
+  if (morningSwitch.checked) {
+    afternoonSwitch.checked = false;
+    fullDaySwitch.checked = false;
+    if (!levStartDate) {
+      createToast("⚠️ เกิดข้อผิดพลาด กรุณาเลือกวันที่เริ่มต้น", 3);
+      morningSwitch.checked = false;
+      return;
+    }
+    document.getElementById('leaveData3').value = levStartDate.split('T')[0] + "T00:00"; // เก็บวันที่และเวลาตอนเช้าไว้
+    document.getElementById('leaveData4').value = levStartDate.split('T')[0] + "T12:00";
+  } else {
+    document.getElementById('leaveData4').value = '';
+  }
+  calculateLeave();
+};
+
+const toggleAfternoonHalfDayLeave = () => {
+  const afternoonSwitch = document.getElementById('afternoonHalfDaySwitch');
+  const morningSwitch = document.getElementById('morningHalfDaySwitch');
+  const fullDaySwitch = document.getElementById('fullDaySwitch');
+  const levStartDate = document.getElementById('leaveData3').value;
+
+  if (afternoonSwitch.checked) {
+    morningSwitch.checked = false;
+    fullDaySwitch.checked = false;
+    if (!levStartDate) {
+      createToast("⚠️ เกิดข้อผิดพลาด กรุณาเลือกวันที่เริ่มต้น", 3);
+      afternoonSwitch.checked = false;
+      return;
+    }
+    // ตั้งค่าเวลาเริ่มต้นบ่าย (12:00) และสิ้นสุดบ่าย (23:59)
+    document.getElementById('leaveData3').value = levStartDate.split('T')[0] + "T12:00";
+    document.getElementById('leaveData4').value = levStartDate.split('T')[0] + "T23:59";
+  } else {
+    document.getElementById('leaveData4').value = '';
+  }
+  calculateLeave();
+};
+
+const calculateLeave = () => {
+  const fullDaySwitch = document.getElementById('fullDaySwitch');
+  const startDate = document.getElementById('leaveData3').value;
+  const endDate = document.getElementById('leaveData4').value;
+
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const diffMs = end - start; // ความต่างของเวลาในหน่วยมิลลิวินาที
+    const diffHours = diffMs / (1000 * 60 * 60); // แปลงเป็นชั่วโมง
+
+    let diffDays = 0;
+    let hours = 0;
+
+    if (fullDaySwitch.checked && diffHours >= 24) {
+      // กรณีเต็มวัน
+      diffDays = Math.ceil(diffHours / 24); // คำนวณจำนวนวัน
+    } else if (!fullDaySwitch.checked && diffHours <= 12 && diffHours > 0) {
+      // กรณีครึ่งวัน (12 ชั่วโมง)
+      hours = 12;
+    }
+
+    document.getElementById('leaveData5').value = diffDays; // จำนวนวัน
+    document.getElementById('leaveData6').value = hours;   // จำนวนชั่วโมง
+  } else {
+    document.getElementById('leaveData5').value = 0;
+    document.getElementById('leaveData6').value = 0;
+  }
+};
+
+const submitFormLeave = () => {
+  event.preventDefault();
+  $.LoadingOverlay("show", { image : "", fontawesome : "fa fa-spinner fa-spin" }); 
+
+  const obj = {
+    leaveKey: document.getElementById('leaveDataKey').value,
+    leaveA: document.getElementById('user-show0').innerText,
+    leaveB: document.getElementById('user-show1').innerText,
+    leaveC: document.getElementById('user-show2').innerText,
+    leaveD: document.getElementById('user-show5').innerText,
+    leaveE: document.getElementById('user-show4').innerText,
+    leaveData1: document.getElementById('leaveData1').value,
+    leaveData2: document.getElementById('leaveData2').value,
+    leaveData3: document.getElementById('leaveData3').value,
+    leaveData4: document.getElementById('leaveData4').value,
+    leaveData5: document.getElementById('leaveData5').value,
+    leaveData6: document.getElementById('leaveData6').value,
+  };
+
+if (!obj.leaveA || !obj.leaveB || !obj.leaveC || !obj.leaveD || !obj.leaveE || !obj.leaveData1 || !obj.leaveData2 || !obj.leaveData3 || !obj.leaveData4 || !obj.leaveData5 || !obj.leaveData6) {
+   createToast("⚠️ กรุณากรอกข้อมูลให้ครบถ้วน", 3);
+  $.LoadingOverlay("hide");
+   return;
+  }
+
+  const fileInput = document.getElementById('leaveData7');
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onloadend = function() {
+      obj.filetype = file.type;
+      obj.imageDataUrl = reader.result;
+      
+      if (!obj.leaveKey) {
+        google.script.run.withSuccessHandler(async (res) => {
+          $.LoadingOverlay("hide");
+          await updateSpecificLeaveData();
+          loadLeaveTypes();
+          updateCalendarLev();
+          insertChartLev();
+          clearFormLeave();
+          renderCalendarLev();
+          createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+        }).addDataLeave(obj);
+      } else {
+        google.script.run.withSuccessHandler(async (res) => {
+          $.LoadingOverlay("hide");
+          await updateSpecificLeaveData();
+          loadLeaveTypes();
+          updateCalendarLev();
+          insertChartLev();
+          clearFormLeave();
+          renderCalendarLev();
+          createToast("✅ แก้ไขข้อมูลสำเร็จ", 1);
+        }).upDataLeave(obj);
+      }
+    };
+    reader.readAsDataURL(file);
+  } else {
+    if (!obj.leaveKey) {
+      google.script.run.withSuccessHandler(async (res) => {
+        $.LoadingOverlay("hide");
+          await updateSpecificLeaveData();
+          loadLeaveTypes();
+          updateCalendarLev();
+          insertChartLev();
+        clearFormLeave();
+        createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+      }).addDataLeave(obj);
+    } else {
+      google.script.run.withSuccessHandler(async (res) => {
+        $.LoadingOverlay("hide");
+          await updateSpecificLeaveData();
+          loadLeaveTypes();
+          updateCalendarLev();
+          insertChartLev();
+        clearFormLeave();
+        createToast("✅ แก้ไขข้อมูลสำเร็จ", 1);
+      }).upDataLeave(obj);
+    }
+  }
+};
+
+const editLeave = (codeID) => {
+  const userRole1 = localStorage.getItem('uiduser') || '';
+  const userRole2 = localStorage.getItem('level') || '';
+  const dataAllLev = allleave.find(row => row[0] === codeID);
+  
+  if (dataAllLev) {
+    if ((userRole2 !== 'SuperAdmin' && userRole2 !== 'Admin' && userRole1 !== dataAllLev[3])) {
+      createToast("⚠️ คุณไม่มีสิทธิ์ในการเข้าถึงรายการนี้", 3);
+      return;
+    }
+    if (dataAllLev[1] !== 'รอตรวจสอบ') {
+      createToast("⚠️ คำขอนี้ไม่สามารถแก้ไขได้", 3);
+      return;
+    }
+    if (dataAllLev[8] === 'ลาป่วยมีใบรับรองแพทย์') {
+      document.getElementById('leaveData7Row').style.display = 'block';
+      document.getElementById('leaveData7').style.display = 'block';
+    } else {
+      document.getElementById('leaveData7Row').style.display = 'none';
+      document.getElementById('leaveData7').style.display = 'none';
+    }
+
+    $('#RPTLModal').modal('show');
+    $('#leaveDataKey').val(dataAllLev[0]);
+    $('#leaveData1').val(dataAllLev[8]);
+    $('#leaveData2').val(dataAllLev[9]);
+    $('#leaveData3').val(dataAllLev[11]);
+    $('#leaveData4').val(dataAllLev[12]);
+    const startDateTime = new Date(dataAllLev[11]);
+    const endDateTime = new Date(dataAllLev[12]);
+    const diffTime = endDateTime - startDateTime;
+    const diffHours = diffTime / (1000 * 60 * 60);
+    const isMorning = (startDateTime.getHours() === 0 && diffHours === 12);
+    const isAfternoon = (startDateTime.getHours() === 12 && diffHours === 12);
+    const isFullDay = (startDateTime.getHours() === 0 && diffHours >= 24);
+
+    document.getElementById('morningHalfDaySwitch').checked = isMorning;
+    document.getElementById('afternoonHalfDaySwitch').checked = isAfternoon;
+    document.getElementById('fullDaySwitch').checked = isFullDay;
+
+    $('#leaveData5').val(dataAllLev[13]);
+    $('#leaveData6').val(dataAllLev[14]);
+
+    calculateLeave();
+  }
+};
+
+const delLeave = (codeID) => {
+  const userRole1 = localStorage.getItem('uiduser') || '';
+  const userRole2 = localStorage.getItem('level') || '';
+  let dataAllLev = allleave.find(row => row[0] === codeID);
+  if (dataAllLev) {
+    if ((userRole2 !== 'SuperAdmin' && userRole2 !== 'Admin' && userRole1 !== dataAllLev[3])) {
+      createToast("⚠️ คุณไม่มีสิทธิ์ในการเข้าถึงรายการนี้", 3);
+      return;
+    }
+    if (dataAllLev[1] !== 'รอตรวจสอบ') {
+      createToast("⚠️ คำขอนี้ไม่สามารถลบได้", 3);
+      return;
+    }
+    $('#confirmBtnDel').off('click').on('click', function() {
+      $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+      $('#DelDataModal').modal('hide');
+      google.script.run.withSuccessHandler(async (res) => {
+        dataAllLev = allleave.filter(row => row[0] !== codeID);
+        $.LoadingOverlay("hide");
+        await updateSpecificLeaveData();
+        loadLeaveTypes();
+        updateCalendarLev();
+        insertChartLev();
+        clearFormLeave();
+        createToast("⛔ ลบข้อมูลสำเร็จ", 0);
+      }).delDataLeave(codeID);
+    });
+    $('#xDelconfirmData').off('click').on('click', function() {
+      $('#DelDataModal').modal('hide');
+    });
+    $('#DelDataModal').modal('show');
+  }
+}
+
+const clearFormLeave = () => {
+  document.getElementById('leaveDataKey').value = '';
+  document.getElementById('leaveData1').value = '';
+  document.getElementById('leaveData2').value = '';
+  document.getElementById('leaveData3').value = '';
+  document.getElementById('leaveData4').value = '';
+  document.getElementById('leaveData5').value = '';
+  document.getElementById('leaveData6').value = '';
+  document.getElementById('leaveData7').value = '';
+  document.getElementById('leaveData7Row').style.display = 'none';
+  document.getElementById('leaveData7').style.display = 'none';
+  document.getElementById('morningHalfDaySwitch').checked = false;
+  document.getElementById('afternoonHalfDaySwitch').checked = false;
+  document.getElementById('fullDaySwitch').checked = false;
+  
+
+  $('#RPTLModal').modal('hide');
+  $('#levSelectModal').modal('hide');
+};
+
+const submitApprovalLeave = (status) => {
+  const leavedata = document.getElementById('approveDataLeave').value;
+  const fullname = document.getElementById('user-show1').innerText;
+  const signame = document.getElementById('user-show4').innerText;
+  if (!leavedata || !fullname || !signame) {
+    createToast("❌ กรุณากรอกข้อมูลให้ครบถ้วน", 0);
+    return;
+  }
+  const data = {
+    codeID: selectedAllleave[0],
+    leavedata: leavedata,
+    fullname: fullname,
+    signame: signame,
+    status: status
+  };
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+  google.script.run.withSuccessHandler(async (res) => {
+  $.LoadingOverlay("hide");
+    $('#leaveApprovalRequestModal').modal('hide');
+    document.getElementById('approveDataLeave').value = '';
+    await updateSpecificLeaveData();
+    loadLeaveTypes();
+    updateCalendarLev();
+    insertChartLev();
+    createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+  }).approvalLeave(data);
+}
+
+const sendLeave = (codeID) => {
+  const data = allleave.find(row => row[0] === codeID);
+  if (!data) {
+    createToast("❌ ไม่พบข้อมูล", 0);
+    return;
+  }
+
+  // คำนวณประวัติการลา
+  const calculateUserLeaveHistory = (data) => {
+    const userLeaves = allleave.filter(leave => 
+      leave[3] === data[3] && 
+      leave[1] === 'อนุมัติ' && 
+      leave[0] !== data[0]
+    );
+
+    const currentLeave = {
+      type: data[8],
+      days: parseFloat(data[13]) || 0,
+      hours: parseFloat(data[14]) || 0
+    };
+
+    let leaveHistory = {
+      sick: { count: 0, days: 0 },
+      personal: { count: 0, days: 0 },
+      vacation: { count: 0, days: 0 },
+      other: { count: 0, days: 0 }
+    };
+
+    userLeaves.forEach(leave => {
+      const days = parseFloat(leave[13]) || 0;
+      const hours = parseFloat(leave[14]) || 0;
+      const totalDays = days + (hours / 24);
+
+      switch (leave[8]) {
+        case 'ลาป่วยมีใบรับรองแพทย์':
+        case 'ลาป่วยไม่มีใบรับรองแพทย์':
+          leaveHistory.sick.count++;
+          leaveHistory.sick.days += totalDays;
+          break;
+        case 'ลากิจจำเป็น':
+        case 'ลากิจทั่วไป':
+          leaveHistory.personal.count++;
+          leaveHistory.personal.days += totalDays;
+          break;
+        case 'ลาพักร้อน':
+          leaveHistory.vacation.count++;
+          leaveHistory.vacation.days += totalDays;
+          break;
+        default:
+          leaveHistory.other.count++;
+          leaveHistory.other.days += totalDays;
+      }
+    });
+
+    const currentDays = currentLeave.days + (currentLeave.hours / 24);
+
+    return [
+      ['ลาป่วย', 
+        `${leaveHistory.sick.days.toFixed(1)} วัน (${leaveHistory.sick.count} ครั้ง)`,
+        (currentLeave.type.includes('ป่วย') ? currentDays.toFixed(1) : '0'),
+        (currentLeave.type.includes('ป่วย') ? (leaveHistory.sick.days + currentDays).toFixed(1) : leaveHistory.sick.days.toFixed(1))
+      ],
+      ['ลากิจ', 
+        `${leaveHistory.personal.days.toFixed(1)} วัน (${leaveHistory.personal.count} ครั้ง)`,
+        (currentLeave.type.includes('กิจ') ? currentDays.toFixed(1) : '0'),
+        (currentLeave.type.includes('กิจ') ? (leaveHistory.personal.days + currentDays).toFixed(1) : leaveHistory.personal.days.toFixed(1))
+      ],
+      ['ลาพักร้อน', 
+        `${leaveHistory.vacation.days.toFixed(1)} วัน (${leaveHistory.vacation.count} ครั้ง)`,
+        (currentLeave.type.includes('พักร้อน') ? currentDays.toFixed(1) : '0'),
+        (currentLeave.type.includes('พักร้อน') ? (leaveHistory.vacation.days + currentDays).toFixed(1) : leaveHistory.vacation.days.toFixed(1))
+      ],
+      ['ลาอื่นๆ', 
+        `${leaveHistory.other.days.toFixed(1)} วัน (${leaveHistory.other.count} ครั้ง)`,
+        (!currentLeave.type.includes('ป่วย') && !currentLeave.type.includes('กิจ') && !currentLeave.type.includes('พักร้อน') ? currentDays.toFixed(1) : '0'),
+        (!currentLeave.type.includes('ป่วย') && !currentLeave.type.includes('กิจ') && !currentLeave.type.includes('พักร้อน') ? (leaveHistory.other.days + currentDays).toFixed(1) : leaveHistory.other.days.toFixed(1))
+      ]
+    ];
+  };
+
+  // แปลงวันที่เป็นภาษาไทย
+  const thaiMonths = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+  ];
+
+  const formatThaiDate1 = (dateStr) => {
+    const date = new Date(dateStr);
+    return {
+      date: date.getDate(),
+      month: thaiMonths[date.getMonth()],
+      year: date.getFullYear() + 543
+    };
+  };
+
+  const formatThaiDate2 = (dateStr) => {
+    const [day, month, year] = dateStr.split('/').map(num => parseInt(num, 10));
+    const thaiMonths = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+    return {
+      date: day,
+      month: thaiMonths[month - 1],
+      year: year + 543
+    };
+  };
+
+  const writingDate = formatThaiDate2(data[2]);
+  const approverDate = formatThaiDate2(data[17]);
+  const startDate = formatThaiDate1(data[11]);
+  const endDate = formatThaiDate1(data[12]);
+  
+  let leaveTypeCheckboxes = {
+    sick: { text: '£', font: 'Wingdings2' },
+    personal: { text: '£', font: 'Wingdings2' },
+    vacation: { text: '£', font: 'Wingdings2' },
+    other: { text: '£', font: 'Wingdings2' }
+  };
+
+  switch (data[8]) {
+    case 'ลาป่วยมีใบรับรองแพทย์':
+    case 'ลาป่วยไม่มีใบรับรองแพทย์':
+      leaveTypeCheckboxes.sick.text = 'R';
+      break;
+    case 'ลากิจจำเป็น':
+    case 'ลากิจทั่วไป':
+      leaveTypeCheckboxes.personal.text = 'R';
+      break;
+    case 'ลาพักร้อน':
+      leaveTypeCheckboxes.vacation.text = 'R';
+      break;
+    default:
+      leaveTypeCheckboxes.other.text = 'R';
+  }
+
+  Promise.all([
+    new Promise((resolve) => loadImagepdfmake(data[7], resolve)),
+    new Promise((resolve) => data[18] ? loadImagepdfmake(data[18], resolve) : resolve(null))
+  ]).then(([signatureUser, signatureApprover]) => {
+    const docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [30, 20, 30, 20],
+      content: [
+        {
+          text: 'ใบลาป่วย ลาคลอดบุตร ลากิจส่วนตัว',
+          style: 'header',
+          alignment: 'center'
+        },
+        {
+          columns: [
+            { width: '*', text: '' },
+            {
+              width: 'auto',
+              text: [
+                { text: 'เขียนที่' },
+                { text: ' ' + data[6] }
+              ]
+            }
+          ],
+          margin: [0, 15, 0, 0]
+        },
+        {
+          columns: [
+            { width: '*', text: '' },
+            {
+              width: 'auto',
+              text: [
+                { text: 'วันที่เขียน ' + writingDate.date + ' เดือน ' + writingDate.month + ' พ.ศ. ' + writingDate.year }
+              ]
+            }
+          ],
+          margin: [0, 5, 0, 0]
+        },
+        {
+          text: 'เรื่อง  ขออนุญาต' + data[8] + '\n' +
+                'เรียน  ผู้บริหาร' + data[6],
+          margin: [0, 15, 0, 0]
+        },
+        {
+          text: [
+            { text: 'ข้าพเจ้า ' + data[4] + ' ตำแหน่ง ' + data[5] + ' ฝ่าย ' + data[6] 
+            ,leadingIndent: 40
+            },
+            {
+              text: [
+                { text: ' ข้าพเจ้าได้ลา ' },
+                leaveTypeCheckboxes.sick,
+                { text: ' ลาป่วย ' },
+                leaveTypeCheckboxes.personal,
+                { text: ' ลากิจ ' },
+                leaveTypeCheckboxes.vacation,
+                { text: ' ลาพักร้อน ' },
+                leaveTypeCheckboxes.other,
+                { text: ' ลาอื่นๆ ' }
+              ],
+              fontSize: 14
+            },
+            { text: 'เนื่องจาก ' },
+            { text: data[9] },
+            { text: ' ตั้งแต่วันที่ ' },
+            { text: startDate.date + ' ' },
+            { text: 'เดือน ' },
+            { text: startDate.month + ' ' },
+            { text: 'พ.ศ. ' },
+            { text: startDate.year + ' ' },
+            { text: 'ถึงวันที่ ' },
+            { text: endDate.date + ' ' },
+            { text: 'เดือน ' },
+            { text: endDate.month + ' ' },
+            { text: 'พ.ศ. ' },
+            { text: endDate.year + ' ' },
+            { text: 'จำนวน ' },
+            { text: data[13] + ' ' },
+            { text: 'วัน ' },
+            { text: data[14] + ' ' },
+            { text: 'ชั่วโมง' }
+          ],
+          alignment: 'justify',
+          margin: [0, 15, 0, 0]
+        },
+        {
+          columns: [
+            {
+              width: '50%',
+              stack: [
+                {
+                  text: 'สถิติการลาในปีงบประมาณนี้',
+                  margin: [0, 15, 0, 5]
+                },
+                {
+                  table: {
+                    widths: ['*', '*', '*', '*'],
+                    body: [
+                      ['ประเภทลา', 'ลามาแล้ว', 'ลาครั้งนี้', 'รวมเป็น'],
+                      ...calculateUserLeaveHistory(data)
+                    ]
+                  },
+                  style: 'tableStyle'
+                }
+              ]
+            },
+            {
+              width: '50%',
+              stack: [
+                signatureUser ? {
+                  image: signatureUser,
+                  width: 60,
+                  alignment: 'center',
+                  margin: [30, 0, 0, 0]
+                } : {},
+                {
+                  text: 'ลงชื่อ................................................ผู้ขออนุญาต',
+                  margin: [30, signatureUser ? 0 : 0, 0, 0]
+                },
+                { text: 'ตำแหน่ง ' + data[5], margin: [30, 5, 0, 0] },
+                { text: 'วันที่ ' + writingDate.date + ' ' + writingDate.month + ' ' + writingDate.year, margin: [30, 5, 0, 0] },
+                signatureApprover ? {
+                  image: signatureApprover,
+                  width: 60,
+                  alignment: 'center',
+                  margin: [30, 10, 0, 0]
+                } : {},
+                {
+                  text: 'ลงชื่อ................................................ผู้บังคับบัญชา',
+                  margin: [30, signatureApprover ? 0 : 0, 0, 0]
+                },
+                { text: 'ผู้บริหาร ' + data[6], margin: [30, 5, 0, 0] },
+                { text: 'วันที่ ' + approverDate.date + ' ' + approverDate.month + ' ' + approverDate.year, margin: [30, 5, 0, 0] },
+                { text: 'คำสั่ง' + data[16] ? data[16] : '', bold: true, margin: [30, 15, 0, 0] },
+                {
+                  text: [
+                    { text: data[1] === 'อนุมัติ' ? 'R' : '£', font: 'Wingdings2' },
+                    { text: ' อนุญาต    ', font: 'THSarabunNew' },
+                    { text: data[1] === 'อนุมัติ' ? '£' : 'R', font: 'Wingdings2' },
+                    { text: ' ไม่อนุญาต', font: 'THSarabunNew' }
+                  ],
+                  margin: [30, 5, 0, 0]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      defaultStyle: {
+        font: 'THSarabunNew',
+        fontSize: 16
+      },
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 20]
+        },
+        tableStyle: {
+          fontSize: 14,
+          alignment: 'center'
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).open();
+  }).catch(error => {
+    console.error('Error:', error);
+    createToast("❌ เกิดข้อผิดพลาดในการสร้างเอกสาร", 0);
+  });
+};
+</script>
