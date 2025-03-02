@@ -1,0 +1,44 @@
+<div class="sidebar position-fixed bg-white border-end shadow">
+  <div class="d-flex align-items-center p-3">
+    <a role="button" class="text-gradient sidebar-logo text-uppercase fw-bold text-decoration-none text-indigo fs-4" id="textSystem"></a>
+    <i class="sidebar-toggle ri-arrow-right-circle-fill set-icons-menu ms-auto fs-5 d-none d-md-block" id="onsideManu"></i>
+  </div>
+  <ul class="sidebar-menu p-3 m-0 mb-0">
+    <li class="sidebar-menu-item active-home" id="manuLi1"><a role="button" onclick="changePage(1)"><i class="ri-home-8-line sidebar-menu-item-icon"></i> หน้าหลัก</a></li>
+    <li class="sidebar-menu-divider mt-3 mb-1 text-uppercase">จัดการข้อมูลหลัก</li>
+    <li class="sidebar-menu-item active-setting" id="manuLi2"><a role="button" onclick="changePage(2)"><i class="ri-draft-line sidebar-menu-item-icon"></i> การลาพนักงาน</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi3"><a role="button" onclick="changePage(3)"><i class="ri-draft-line sidebar-menu-item-icon"></i> การขอหนังสือรับรอง</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi4"><a role="button" onclick="changePage(4)"><i class="ri-presentation-line sidebar-menu-item-icon"></i> จัดการเงินเดือน</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi5"><a role="button" onclick="changePage(5)"><i class="ri-bank-line sidebar-menu-item-icon"></i> นำส่งเงินเดือน</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi6"><a role="button" onclick="changePage(6)"><i class="ri-id-card-line sidebar-menu-item-icon"></i> จัดการข้อมูลพนักงาน</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi7"><a role="button" onclick="changePage(7)"><i class="ri-image-edit-line sidebar-menu-item-icon"></i> จัดการข้อมูลข่าวสาร</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi8"><a role="button" onclick="changePage(8)"><i class="ri-file-chart-line sidebar-menu-item-icon"></i> รายงานการปฏิบัติงาน</a></li>
+    <li class="sidebar-menu-item active-setting" id="manuLi9"><a role="button" onclick="changePage(9)"><i class="ri-file-chart-line sidebar-menu-item-icon"></i> รายงานการลางาน</a></li>
+
+    <li class="sidebar-menu-divider mt-3 mb-1 text-uppercase">USER</li>
+    <li class="sidebar-menu-item has-dropdown" id="manuLi10">
+      <a role="button"><i class="ri-user-follow-line sidebar-menu-item-icon"></i>ผู้ใช้งานระบบ<i class="ri-arrow-down-s-line sidebar-menu-item-accordion ms-auto"></i></a>
+        <ul class="sidebar-dropdown-menu">
+          <li class="sidebar-dropdown-menu-item" style="list-style-type: none;" ><a role="button" onclick="changePage(10)"><i class="ri-arrow-drop-right-fill"></i>&nbsp;ประวัติผู้ใช้งาน</a></li>
+          <li class="sidebar-dropdown-menu-item" style="list-style-type: none;" id="manuLi11"><a role="button" onclick="changePage(11)"><i class="ri-arrow-drop-right-fill"></i>&nbsp;ผู้ใช้งานระบบ</a></li>
+        </ul>
+    </li>
+
+    <li class="sidebar-menu-divider mt-3 mb-1 text-uppercase">SETTING</li>
+      <li class="sidebar-menu-item has-dropdown" id="manuLi12">
+        <a role="button"><i class="ri-settings-5-line sidebar-menu-item-icon"></i>ตั้งค่าระบบ<i class="ri-arrow-down-s-line sidebar-menu-item-accordion ms-auto"></i></a>
+          <ul class="sidebar-dropdown-menu">
+            <li class="sidebar-dropdown-menu-item" style="list-style-type: none;"><a role="button" onclick="changePage(12)"><i class="ri-arrow-drop-right-fill"></i>&nbsp;ตั้งค่าระบบ</a></li>
+            <li class="sidebar-dropdown-menu-item" style="list-style-type: none;" id="manuLi13"><a role="button" onclick="changePage(13)"><i class="ri-arrow-drop-right-fill"></i>&nbsp;ตั้งค่าการทำงานระบบ</a></li>
+            <li class="sidebar-dropdown-menu-item has-dropdown" style="list-style-type: none;"><a role="button"><i class="ri-arrow-drop-right-fill"></i>&nbsp;ตั้งค่าอื่น ๆ<i class="ri-arrow-down-s-line sidebar-menu-item-accordion ms-auto"></i></a>
+              <ul class="sidebar-dropdown-menu">
+                <li class="sidebar-dropdown-menu-item" style="list-style-type: none;"><a role="button" onclick="loadTodos('Department')"><i class="ri-arrow-right-s-fill"></i> ตำแหน่ง</a></li>
+                <li class="sidebar-dropdown-menu-item" style="list-style-type: none;"><a role="button" onclick="loadTodos('Group')"><i class="ri-arrow-right-s-fill"></i> แผนก</a></li>
+                <li class="sidebar-dropdown-menu-item" style="list-style-type: none;"><a role="button" onclick="loadTodos('Objective')"><i class="ri-arrow-right-s-fill"></i> สถานะการตอบรับ</a></li>
+              </ul>
+            </li>
+          </ul>
+      </li>
+    <li class="sidebar-menu-item active-close"><a role="button" data-bs-target="#logoutModal" data-bs-toggle="modal"><i class="ri-logout-box-line sidebar-menu-item-icon"></i> ออกจากระบบ</a></li>
+  </ul>
+</div>
