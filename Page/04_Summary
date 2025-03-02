@@ -1,0 +1,684 @@
+<div class="row g-3 mt-2">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm mb-2">
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">💹 Dashboard</div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <ul class="box-info">
+          <li>
+            <i class="fa-solid fa-sack-dollar"></i>
+            <span class="text">
+              <p>พนักงาน</p>
+              <h3 id="countingSalaryA">0 <span style="font-size: 12px">(บาท)</span></h3>                
+            </span>
+          </li>
+          <li>
+            <i class="fa-solid fa-landmark"></i>
+            <span class="text">
+              <p>รวมจ่ายสุทธิ</p>
+              <h3 id="countingSalaryB">0 <span style="font-size: 12px">(บาท)</span></h3>                
+            </span>
+          </li>
+          <li>
+            <i class="fa-solid fa-user-doctor"></i>
+            <span class="text">
+              <p>รวมหักลา</p>
+              <h3 id="countingSalaryC">0 <span style="font-size: 12px">(บาท)</span></h3>        
+            </span>
+          </li>
+          <li>
+            <i class="fa-solid fa-user-shield"></i>
+            <span class="text">
+              <p>ประกันสังคม</p>
+              <h3 id="countingSalaryD">0 <span style="font-size: 12px">(บาท)</span></h3>               
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-12 mb-2 mb-md-0">💹 สถิติการจ่ายเงินเดือน</div>
+        </div>
+      </div>
+        <div class="card-body rounded-4">
+          <div id="chartSalary" style="width: 100%; height: 200px;"></div>
+        </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-12 mb-2 mb-md-0">💹 เปอร์เซ็นการจ่าย</div>
+        </div>
+      </div>
+        <div class="card-body rounded-4">
+          <div id="chartSummary" style="width: 100%; height: 200px;"></div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">🏛️ รายการนำส่งเงินเดือน</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+            <select class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" onchange="updateItemsSummary(this.value)">
+              <option value="10">✅ 10</option>
+              <option value="20">✅ 25</option>
+              <option value="50">✅ 50</option>
+              <option value="100">✅ 100</option>
+              <option value="all">✅ ทั้งหมด</option>
+            </select>
+            <input type="search" class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" id="searchSummary" placeholder="🔍ค้นหาข้อมูล..." oninput="filterSummary()">
+          </div>
+        </div>
+
+      </div>
+      <div class="card-body rounded-4">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">งวดที่</th>
+                <th scope="col" class="text-center">วันที่ทำรายการ</th>
+                <th scope="col" class="text-center">กำหนดชำระ</th>
+                <th scope="col" class="text-center">จำนวนพนักงาน</th>
+                <th scope="col" class="text-center">รวมหักสาย</th>
+                <th scope="col" class="text-center">รวมหักลา</th>
+                <th scope="col" class="text-center">รวมหักประกันสังคม</th>
+                <th scope="col" class="text-center">รวมหักอื่น</th>
+                <th scope="col" class="text-center">รวมOT</th>
+                <th scope="col" class="text-center">รายได้อื่นๆ</th>
+                <th scope="col" class="text-center">รวมจ่ายพนักงาน</th>
+                <th scope="col" class="text-center">รวมจ่ายสุทธิ</th>
+                <th scope="col" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableDataSummary">
+              <tr>
+                <td colspan='13' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>
+              </tr>
+            </tbody>       
+          </table>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0 align-items-center" id="paginationSummaryInfo"></div>
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div id="paginationSummary" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let filteredSummary = [];
+let currentSummary = 1;
+let itemsPerSummary = 10;
+
+const renderSummary = (res) => {
+  const table = document.getElementById('tableDataSummary');
+  table.innerHTML = '';
+
+  res.sort((a, b) => {
+    const dateA = new Date(a[4].split('/').reverse().join('/'));
+    const dateB = new Date(b[4].split('/').reverse().join('/'));
+    return dateB - dateA;
+  });
+
+  const startIndex = (currentSummary - 1) * itemsPerSummary;
+  const endIndex = startIndex + itemsPerSummary;
+  const emp = res.slice(startIndex, endIndex);
+
+  const startRow = startIndex + 1;
+  const endRow = startIndex + emp.length;
+  const totalRows = res.length;
+
+  document.getElementById('paginationSummaryInfo').innerText = `แสดง ${startRow} ถึง ${endRow} จาก ${totalRows} แถว`;
+
+  if (emp.length === 0) {
+    const row = table.insertRow();
+    row.innerHTML = `<td colspan='13' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>`;
+    return;
+  }
+
+  emp.forEach((rowIndex) => {
+    const details = JSON.parse(rowIndex[5]);
+    const employeeCount = details.length;
+    var row = table.insertRow();
+    row.innerHTML = `
+      <td class="text-center"><span style="font-size: 14px;">${rowIndex[1]}</span></td>
+      <td class="text-center"><span style="font-size: 14px;">${rowIndex[3]}</span></td>
+      <td class="text-center"><span style="font-size: 14px;">${rowIndex[4]}</span></td>
+      <td class="text-center"><span style="font-size: 14px;">🙍‍♂️ <span style="color: var(--box1);">จำนวน ${employeeCount} คน</span></span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box4);"><i class="fa-solid fa-circle-arrow-down"></i> ${rowIndex[6]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box4);"><i class="fa-solid fa-circle-arrow-down"></i> ${rowIndex[7]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box4);"><i class="fa-solid fa-circle-arrow-down"></i> ${rowIndex[9]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box4);"><i class="fa-solid fa-circle-arrow-down"></i> ${rowIndex[10]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box2);"><i class="fa-solid fa-circle-arrow-up"></i> ${rowIndex[8]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box2);""><i class="fa-solid fa-circle-arrow-up"></i> ${rowIndex[11]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box3);"">🙍‍♂️ ${rowIndex[12]} บาท</span></td>
+      <td class="text-center"><span style="font-size: 14px;color: var(--box2);""><i class="fa-solid fa-sack-dollar"></i> ${rowIndex[13]} บาท</span></td>
+      <td class="text-center">
+        <div style="display: flex; justify-content: center;">
+          <select class="form-control me-2" style="font-size: 14px; width: auto;" disabled>
+            <option value="รอดำเนินการ" ${rowIndex[2] === 'รอดำเนินการ' ? 'selected' : ''}>⌛ รอดำเนินการ</option>
+            <option value="ยกเลิกรายการ" ${rowIndex[2] === 'ยกเลิกรายการ' ? 'selected' : ''}>❌ ยกเลิกรายการ</option>
+            <option value="ชำระเงินแล้ว" ${rowIndex[2] === 'ชำระเงินแล้ว' ? 'selected' : ''}>✅ ชำระเงินแล้ว</option>
+          </select>
+          <div class="dropdown">
+            <button class="btn btn-sm del-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-ellipsis"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item hover-highlight" onclick="editSummary('${rowIndex[0]}')"><i class="fa-solid fa-pen-to-square"></i> แก้ไขรายการ</a></li>
+              <li><a class="dropdown-item hover-highlight" onclick="sendSummary('${rowIndex[0]}')"><i class="fa-solid fa-building-columns"></i> นำส่งข้อมูล</a></li>
+              <li><a class="dropdown-item hover-highlight" onclick="sendPayslip('${rowIndex[0]}')"><i class="fa-regular fa-paper-plane"></i> ส่งสลีปทั้งหมด</a></li>
+              <li><a class="dropdown-item hover-highlight" onclick="sendExcel('${rowIndex[0]}')"><i class="fa-regular fa-file-excel"></i> Download Excel</a></li>
+              <li><a class="dropdown-item hover-highlight" onclick="delSummary('${rowIndex[0]}')"><i class="fa-solid fa-trash-can"></i> ลบรายการ</a></li>
+            </ul>
+          </div>
+        </div>
+      </td>
+    `;
+  });
+}
+
+const renderPageSummary = (totalItems) => {
+  const totalPages = Math.ceil(totalItems / itemsPerSummary);
+  const paginationContainer = document.getElementById('paginationSummary');
+  paginationContainer.innerHTML = '';
+  if (totalPages > 1) {
+    const createPageButton = (text, page, isDisabled = false, isActive = false) => {
+      const li = document.createElement('li');
+      li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+      const button = document.createElement('button');
+      button.className = 'page-link';
+      button.innerText = text;
+      button.onclick = () => {
+        if (!isDisabled) {
+        currentSummary = page;
+        renderSummary(allSummary);
+        renderPageSummary(allSummary.length);
+        }
+      };
+      li.appendChild(button);
+      return li;
+    };
+    paginationContainer.appendChild(createPageButton('ย้อนกลับ', currentSummary - 1, currentSummary === 1));
+
+    if (currentSummary > 2) {
+      paginationContainer.appendChild(createPageButton(1, 1, false, currentSummary === 1));
+      if (currentSummary > 3) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+    }
+    paginationContainer.appendChild(createPageButton(currentSummary, currentSummary, false, true));
+
+    if (currentSummary < totalPages - 1) {
+      if (currentSummary < totalPages - 2) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+      paginationContainer.appendChild(createPageButton(totalPages, totalPages, false, currentSummary === totalPages));
+    }
+    paginationContainer.appendChild(createPageButton('ถัดไป', currentSummary + 1, currentSummary === totalPages));
+  }
+}
+
+const filterSummary = () => {
+  const query = document.getElementById('searchSummary').value.toLowerCase();
+  filteredSummary = allSummary.filter(row => {
+    return row.some(column => column.toLowerCase().includes(query));
+  });
+
+  currentSummary = 1;
+  renderSummary(filteredSummary);
+  renderPageSummary(filteredSummary.length);
+}
+
+const updateItemsSummary = (value) => {
+  if (value === "all") {
+    itemsPerSummary = filteredSummary.length;
+  } else {
+    itemsPerSummary = parseInt(value, 10);
+  }
+
+  currentSummary = 1;
+  renderSummary(filteredSummary);
+  renderPageSummary(filteredSummary.length);
+}
+
+const editSummary = (codeID) => {
+  const summaryData = allSummary.find(summary => summary[0] === codeID);
+
+  if (!summaryData) {
+    createToast("⚠️ ไม่พบข้อมูลที่ต้องการแก้ไข", 3);
+    return;
+  }
+
+  const editMode = true;
+  const period = summaryData[1]; // งวดที่
+  const paymentDate = summaryData[4]; // กำหนดชำระ
+  const totalDow = parseFloat(summaryData[10].replace(/,/g, '')) || 0;  // รวมปรับลด
+  const totalAdj = parseFloat(summaryData[11].replace(/,/g, '')) || 0;  // รวมปรับเพิ่ม
+  const salaryBefore = parseFloat(summaryData[12].replace(/,/g, '')) || 0;  // รวมจ่ายพนักงาน
+  const salaryAfter = parseFloat(summaryData[13].replace(/,/g, '')) || 0;  // รวมจ่ายสุทธิ
+
+  const selectPeriod = document.getElementById('selectPeriod');
+  const periodOption = Array.from(selectPeriod.options).find(option => option.text.includes(period));
+  if (periodOption) {
+    selectPeriod.value = periodOption.value;
+  }
+
+  document.getElementById('dataSalary').value = paymentDate.split('/').reverse().join('-');
+  document.getElementById('dataSalaryKey').value = codeID;
+
+  document.getElementById('salaryBefore').textContent = salaryBefore.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('salaryAfter').textContent = salaryAfter.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalAdj').textContent = totalAdj.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalDow').textContent = totalDow.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  changePage(4);
+  renderSalaryData(editMode, codeID);
+};
+
+const delSummary = (codeID) => {
+  let rowIndex = allSummary.find(row => row[0] === codeID);
+  if (rowIndex) {
+    $('#confirmBtnDel').off('click').on('click', function() {
+      $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+      $('#DelDataModal').modal('hide');
+      google.script.run.withSuccessHandler(async (res) => {
+        rowIndex = allSummary.filter(row => row[0] !== codeID);
+        $.LoadingOverlay("hide");
+        await updateSpecificSummaryData();
+        createToast("⛔ ลบข้อมูลสำเร็จ", 0);
+      }).delDataSummary(codeID);
+    });
+    $('#xDelconfirmData').off('click').on('click', function() {
+      $('#DelDataModal').modal('hide');
+    });
+    $('#DelDataModal').modal('show');
+  }
+}
+
+let selectedBankCodeID = null;
+
+const sendSummary = (codeID) => {
+  selectedBankCodeID = codeID;
+  openBankSelectModal();
+};
+
+const sendSummaryBankCode = (codeID, bankCode) => {
+  const summaryData = allSummary.find(summary => summary[0] === codeID);
+
+  if (!summaryData) {
+    createToast("⚠️ ไม่พบข้อมูลที่นำส่งข้อมูล", 3);
+    return;
+  }
+
+  try {
+    let employeeDetails = JSON.parse(summaryData[5]);
+    let textFileContent = '';
+
+    employeeDetails.forEach(employee => {
+      let uidUser = employee.uidUser.replace("รหัสพนักงาน: ", "");
+      let userData = dataUsers && dataUsers.find(user => user[0] === uidUser);
+      
+      if (userData) {
+        let bankAccount = userData[25]; // บัญชีธนาคาร
+        let citizenId = userData[12]; // เลขบัตรประชาชน
+        let fullName = employee["fullName"].replace("ชื่อ สกุล: ", ""); // ชื่อเต็ม
+        let totalIncome = employee["totalIncome"]; // รวมเงินได้
+        let email = userData[30]; // Email
+        let mobile = userData[32]; // เบอร์โทรศัพท์
+        textFileContent += `${bankCode} ${bankAccount} ${citizenId} ${fullName} ${totalIncome} ${email} ${mobile}\n`;
+      } else {
+        createToast("⚠️ ไม่พบข้อมูลพนักงานสำหรับ UID", 0);
+      }
+    });
+
+    const blob = new Blob([textFileContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'HRCloud-Epic Coding Channel.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    createToast("✅ สร้างไฟล์ .txt สำเร็จ!", 1);
+
+    google.script.run
+      .withSuccessHandler(async (res) => {
+        await updateSpecificSummaryData();
+        createToast("✅ ปรับสถานะรายการสำเร็จ!", 1);
+      })
+      .withFailureHandler(async (res) => {
+        await updateSpecificSummaryData();
+        createToast("⚠️ เกิดข้อผิดพลาดในการปรับสถานะ", 0);
+      })
+      .updatebankCode(codeID, "ชำระเงินแล้ว");
+
+  } catch (e) {
+    createToast("⚠️ เกิดข้อผิดพลาดในการประมวลผลข้อมูล", 0);
+    console.error(e);
+  }
+};
+
+const sendExcel = (codeID) => {
+  const summaryData = allSummary.find(summary => summary[0] === codeID);
+
+  if (!summaryData) {
+    createToast("⚠️ ไม่พบข้อมูลที่นำส่งข้อมูล", 0);
+    return;
+  }
+
+  try {
+    let employeeDetails = JSON.parse(summaryData[5]);
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    // แถวผสานที่ด้านบน
+    const mergedRow = document.createElement('tr');
+    const mergedCell = document.createElement('td');
+    mergedCell.colSpan = 20;  // ผสานเซลล์ทั้งหมด (จำนวนคอลัมน์)
+    mergedCell.textContent = 'งวดเงินเดือน: ' + summaryData[1] + ' | รวมจ่ายพนักงาน: ' + summaryData[12] + ' | รายได้รวม: ' + summaryData[13];
+    mergedCell.style.fontWeight = 'bold';  // ทำให้ข้อความตัวหนา
+    mergedRow.appendChild(mergedCell);
+    thead.appendChild(mergedRow);  // เพิ่มแถวผสานไปที่ thead
+
+    // สร้างหัวตาราง
+    const headers = [
+      "รหัสพนักงาน", "ชื่อ สกุล", "ตำแหน่ง", "แผนก", "เลขบัตรประชาชน", 
+      "เงินเดือน", "เงินพิเศษ", "สายรวม", "ลาป่วย", "ลากิจ", 
+      "ลาพักร้อน", "ลาอื่นๆ", "หักสาย", "หักลา", "จำนวน OT", 
+      "รายได้ OT", "รายได้อื่นๆ", "หักอื่นๆ", "ประกันสังคม", "รายได้รวม"
+    ];
+
+    const headerRow = document.createElement('tr');
+    headers.forEach(header => {
+      const th = document.createElement('th');
+      th.textContent = header;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // เพิ่มข้อมูลพนักงานแต่ละคนในตาราง
+    employeeDetails.forEach(employee => {
+      const row = document.createElement('tr');
+      let uidUser = employee.uidUser.replace("รหัสพนักงาน: ", "");
+      let userData = dataUsers && dataUsers.find(user => user[0] === uidUser);
+      let citizenId = userData ? "'" + userData[12].toString() : "ไม่พบข้อมูล";
+
+      const cells = [
+        uidUser,
+        employee["fullName"].replace("ชื่อ สกุล: ", ""),
+        employee["department"].replace("ตำแหน่ง: ", ""),
+        employee["group"].replace("แผนก: ", ""),
+        citizenId,
+        employee["salary"],
+        employee["specialAllowance"],
+        employee["lateHours"],
+        employee["sickLeave"],
+        employee["personalLeave"],
+        employee["vacationLeave"],
+        employee["otherLeave"],
+        employee["lateDeductions"],
+        employee["leaveDeductions"],
+        employee["otHours"],
+        employee["otIncome"],
+        employee["otherIncome"],
+        employee["otherDeductions"],
+        employee["socialSecurity"],
+        employee["totalIncome"]
+      ];
+      cells.forEach(cellContent => {
+        const td = document.createElement('td');
+        td.textContent = cellContent;
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    const workbook = XLSX.utils.table_to_book(table, { sheet: "Employee Summary" });
+    XLSX.writeFile(workbook, 'HRCloud-Epic Coding Channel.xlsx');
+
+  } catch (e) {
+    createToast("⚠️ เกิดข้อผิดพลาดในการประมวลผลข้อมูล", 0);
+    console.error(e);
+  }
+};
+
+const sendPayslip = (codeID) => {
+  const summaryData = allSummary.find(summary => summary[0] === codeID);
+
+  if (!summaryData) {
+    createToast("⚠️ ไม่พบข้อมูลที่นำส่งข้อมูล", 0);
+    return;
+  }
+
+  let employeeDetails = JSON.parse(summaryData[5]);
+  let totalEmployees = employeeDetails.length; // จำนวนพนักงานทั้งหมด
+  let emailsSent = 0; // ตัวนับอีเมลที่ถูกส่งสำเร็จ
+
+  employeeDetails.forEach(employee => {
+    let uidUser = employee.uidUser.replace("รหัสพนักงาน: ", "");
+    let userData = dataUsers && dataUsers.find(user => user[0] === uidUser);
+
+    if (userData) {
+      let email = userData[30];
+
+      // คำนวณเงินได้สะสมและประกันสังคมสะสม
+      let retainedIncome = allSummary
+        .filter(s => JSON.parse(s[5]).some(e => e.uidUser.includes(uidUser)))
+        .reduce((total, s) => total + JSON.parse(s[5])
+          .filter(e => e.uidUser.includes(uidUser))
+          .reduce((sum, e) => sum + e.totalIncome, 0), 0);
+
+      let retainedSocialSecurity = allSummary
+        .filter(s => JSON.parse(s[5]).some(e => e.uidUser.includes(uidUser)))
+        .reduce((total, s) => total + JSON.parse(s[5])
+          .filter(e => e.uidUser.includes(uidUser))
+          .reduce((sum, e) => sum + e.socialSecurity, 0), 0);
+
+      let payrollData = {
+        fullname: employee["fullName"].replace("ชื่อ สกุล: ", ""),
+        uid: uidUser,
+        department: employee["department"].replace("ตำแหน่ง: ", ""),
+        group: employee["group"].replace("แผนก: ", ""),
+        paymentPeriod: summaryData[1],
+        paymentDate: summaryData[4],
+        accountbank: userData[25],
+        paysalary: employee["salary"],
+        payspecial: employee["specialAllowance"],
+        overtime: employee["otIncome"],
+        socialSecurity: employee["socialSecurity"],
+        commission: employee["otherIncome"],
+        absentDeduction: employee["lateDeductions"] + employee["leaveDeductions"],
+        otherDeduction: employee["otherDeductions"],
+        totalpaysalary: employee["totalIncome"],
+        adjustments: employee["salary"] + employee["specialAllowance"] + employee["otIncome"] + employee["otherIncome"],
+        deductions: employee["lateDeductions"] + employee["leaveDeductions"] + employee["otherDeductions"] + employee["socialSecurity"],
+        retainedIncome: retainedIncome,
+        retainedSocialSecurity: retainedSocialSecurity
+      };
+
+      createPayroll(payrollData, (base64PDF) => {
+        google.script.run.withSuccessHandler((res) => {
+          emailsSent++; 
+          if (emailsSent === totalEmployees) {
+            createToast("✅ ส่ง PaySlip สำเร็จ", 1);
+          }
+        }).sendPayrollEmail(email, { ...payrollData, base64: base64PDF });
+      });
+    } else {
+      createToast(`⚠️ ไม่พบข้อมูลพนักงานสำหรับ UID: ${uidUser}`, 0);
+    }
+  });
+};
+
+const formatCountsSalary = (num) => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(2) + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(2) + 'K';
+  } else {
+    return num.toLocaleString();
+  }
+}
+
+const updateCountsSalary = (data) => { 
+  const countingSalaryA = data.reduce((sum, item) => 
+    sum + (parseFloat(item[12].replace(/,/g, '')) || 0), 0);
+  const countingSalaryB = data.reduce((sum, item) => 
+    sum + (parseFloat(item[13].replace(/,/g, '')) || 0), 0);
+  const countingSalaryC = data.reduce((sum, item) => 
+    sum + (parseFloat(item[7].replace(/,/g, '')) || 0), 0);
+  const countingSalaryD = data.reduce((sum, item) => 
+    sum + (parseFloat(item[9].replace(/,/g, '')) || 0), 0);
+
+  document.getElementById('countingSalaryA').innerText = formatCountsSalary(countingSalaryA.toFixed(2));
+  document.getElementById('countingSalaryB').innerText = formatCountsSalary(countingSalaryB.toFixed(2));
+  document.getElementById('countingSalaryC').innerText = formatCountsSalary(countingSalaryC.toFixed(2));
+  document.getElementById('countingSalaryD').innerText = formatCountsSalary(countingSalaryD.toFixed(2));
+}
+
+const insertChartSalary = (data) => { 
+  const checkChart1 = document.querySelector("#chartSalary").querySelector('.apexcharts-canvas');
+  const checkChart2 = document.querySelector("#chartSummary").querySelector('.apexcharts-canvas');
+  if (checkChart1) {
+    checkChart1.remove();
+  }
+  if (checkChart2) {
+    checkChart2.remove();
+  }
+
+  let monthlyTotalIncome = new Map();
+  const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+  const colors = ['#3c8cf3', '#05be8a', '#745af2', '#ef5350', '#ffca28', '#8e44ad', '#3498db', '#1abc9c', '#e74c3c', '#f39c12', '#d35400', '#2ecc71'];
+
+  data.forEach((item) => {
+    if (item[4] && item[13]) {
+      const parts = item[4].split("/"); // แยกวันที่/เดือน/ปี
+      const dueDate = new Date(parts[2], parts[1] - 1, parts[0]); // แปลงวันที่ให้ถูกต้อง
+      const month = dueDate.getMonth(); // หาค่าเดือนจากวันที่ที่กำหนด
+      const monthName = monthNames[month];
+
+      const totalIncome = parseFloat(item[13].replace(/,/g, '')) || 0; // แปลงรายได้รวมพร้อมจัดการกับเครื่องหมายจุลภาค
+
+      if (monthlyTotalIncome.has(monthName)) {
+        monthlyTotalIncome.set(monthName, monthlyTotalIncome.get(monthName) + totalIncome);
+      } else {
+        monthlyTotalIncome.set(monthName, totalIncome);
+      }
+    }
+  });
+
+  let totalIncomeAllMonths = Array.from(monthlyTotalIncome.values()).reduce((acc, val) => acc + val, 0); // หารายได้รวมของทุกเดือน
+  let seriesData = monthNames.map(month => monthlyTotalIncome.get(month) || 0);
+
+  // คำนวณเปอร์เซ็นต์ของแต่ละเดือน
+  let percentageData = seriesData.map(val => ((val / totalIncomeAllMonths) * 100).toFixed(2)); // คำนวณเป็น % แต่จะเก็บเป็น string
+
+  // แปลงค่า % เป็นตัวเลขเพื่อให้ Pie Chart แสดงผลได้
+  let percentageDataNumbers = percentageData.map(val => parseFloat(val));
+
+  // กราฟ Bar สำหรับรายได้รวม
+  var optionsBar = {
+    series: [{
+      name: 'รายได้รวม',
+      data: seriesData.map(val => val.toFixed(2))
+    }],
+    chart: {
+      height: 260,
+      type: 'bar',
+      events: {
+        click: function(chart, w, e) {
+          // เมื่อคลิกที่กราฟ
+        }
+      }
+    },
+    colors: colors,
+    plotOptions: {
+      bar: {
+        columnWidth: '45%',
+        distributed: true,
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    legend: {
+      show: false
+    },
+    xaxis: {
+      categories: monthNames,
+      labels: {
+        style: {
+          colors: colors,
+          fontSize: '12px',
+          fontFamily: 'Prompt, sans-serif'
+        }
+      }
+    }
+  };
+
+  const chartBar = new ApexCharts(document.querySelector("#chartSalary"), optionsBar);
+  chartBar.render();
+
+  // กราฟ Pie สำหรับเปอร์เซ็นต์รายได้ของแต่ละเดือน
+  var optionsPie = {
+    series: percentageDataNumbers, // ใช้ค่าตัวเลขที่ถูกแปลง
+    chart: {
+      height: 270,
+      type: 'pie',
+    },
+    colors: colors, // ใช้สีที่กำหนดไว้
+    labels: monthNames, // แสดงชื่อเดือนในกราฟ
+    legend: {
+      position: 'right',  // ตั้งตำแหน่ง legend ให้ไปทางขวา
+      horizontalAlign: 'center', // จัดชิดแนวนอนให้อยู่ตรงกลาง
+      floating: false
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val) {
+        return val.toFixed(2) + '%';
+      }
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return val.toFixed(2) + '%';
+        }
+      }
+    }
+  };
+
+  const chartPie = new ApexCharts(document.querySelector("#chartSummary"), optionsPie);
+  chartPie.render();
+};
+</script>
