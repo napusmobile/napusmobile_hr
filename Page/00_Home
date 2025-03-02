@@ -1,0 +1,1141 @@
+<div class="row g-3 mt-2 mb-2">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm" style="background-image: url('https://raw.githubusercontent.com/EPICCODING17/LOGO/main/MapsGPS1.png'); background-size: cover; background-position: center;">
+      <div class="card-body rounded-4">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="d-flex align-items-center mb-2">
+              <img id="picadmin2" src="https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png" alt="ProFile" class="rounded-circle me-2" width="100px" height="100px">
+                <div>
+                  <strong>รหัสพนักงาน : </strong><small id="user-show0" style="color: var(--box2);font-weight: bold;"></small><br>
+                  <strong>ชื่อ นามสกุล : </strong><small id="user-show1" style="color: var(--box1);font-weight: bold;"></small><br>
+                  <strong>ตำแหน่ง : </strong><small id="user-show2" style="color: var(--box3);font-weight: bold;"></small><br>
+                  <strong>Level : </strong><small id="user-show3" style="color: var(--box2);font-weight: bold;"></small><br>
+                  <span id="user-show4" style="display:none"></span>
+                  <span id="user-show5" style="display:none"></span>
+                  <a type="button" class="btn set-button me-2 mb-2 mb-md-0" data-bs-target="#NewProfileModal" data-bs-toggle="modal"><i class="fa-solid fa-circle-user"></i> โปรไฟล์</a>
+                  <a type="button" class="btn del-button me-2 mb-2 mb-md-0" data-bs-toggle="modal" data-bs-target="#userChangePwModal"><i class="fa-solid fa-pen-to-square"></i> รหัสผ่าน</a>
+                  <a type="button" class="btn edit-button me-2 mb-2 mb-md-0" data-bs-toggle="modal" data-bs-target="#NewSigModal"><i class="fa-solid fa-signature"></i> ลายเซ็น</a>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex justify-content-end">
+              <div class="text-end">
+                <h2 id="currentdate" style="color: var(--box1);font-weight: bold;"></h2>
+                <h5 id="shiftTimes" style="color: var(--box2);font-weight: bold;"></h5>
+                <h5 id="location" style="color: var(--box3);font-weight: bold;"></h5>
+                  <a type="button" id="select-branch-button" class="btn upload-button me-2 mb-2 mb-md-0" onclick="openBranchSelectModal()"><i class="fa-solid fa-location-dot"></i> ลงเวลา</a>
+                  <button type="button" class="btn set-button me-2 mb-2 mb-md-0" onclick="openLevSelectModal();"><i class="fa-solid fa-truck-plane"></i> ลางาน</button>
+                  <button type="button" class="btn edit-button me-2 mb-2 mb-md-0" data-bs-target="#rqtBodyModal" data-bs-toggle="modal"><i class="fa-solid fa-file-signature"></i> รับรอง</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-9">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-2">
+          <div class="card-header bg-white">
+            <div class="row">
+              <div class="col-12 col-md-4 mb-2 mb-md-0">📢 ข่าวสาร</div>
+            </div>
+          </div>
+          <div class="card-body rounded-4" style="max-height: 300px; overflow-y: auto;">
+            <div id="showTableNewsDB"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-2">
+          <div class="card-header bg-white">
+            <div class="row">
+              <div class="col-12">💹 สถิติการลา</div>
+            </div>
+          </div>
+          <div class="card-body rounded-4" style="max-height: 300px;">
+            <div id="chartLev" style="width: 100%; height: 300px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">🗓️ ตารางวันหยุด</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+            <select id="yearSelect" class="form-select me-2 mb-2 mb-md-0" style="width: 100px;" onchange="updateCalendarLev()"></select>
+            <select id="monthSelect" class="form-select me-2 mb-2 mb-md-0" style="width: 100px;" onchange="updateCalendarLev()"></select>
+            <button type="button" class="btn set-button me-2 mb-2 mb-md-0" onclick="showHolidayModal()"><i class="fa-regular fa-calendar-days"></i> ตารางวันหยุด</button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <div class="custom-table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th scope="col" rowspan="2" class="text-center">ชื่อ สกุล</th>
+                  <th scope="col" id="monthHeaderLev" class="text-center">ประจำเดือน</th>
+                </tr>
+                <tr id="monthDaysLev">
+                  <!-- จุดนี้จะแทรกข้อมูลรายเดือนอิงค์ตามวันที่ปัจจุบัน -->
+                </tr>
+              </thead>
+              <tbody id="tableCalendarLev"></tbody>       
+            </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm mb-1">
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">🗓️ ปฏิติงาน</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+            <select id="yearTimeAttendance" class="form-select me-2 mb-2 mb-md-0" style="width: 100px;" onchange="updateCountsCheckIN()"></select>
+            <select id="monthTimeAttendance" class="form-select me-2 mb-2 mb-md-0" style="width: 100px;" onchange="updateCountsCheckIN()"></select>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="task-list task-list-1">
+          <div class="task">
+            <div class="icon-task">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div class="task-details">
+              <span class="task-title">ลงเวลาเข้างาน</span>
+            </div>
+            <div class="task-badge" id="countingCheckinA">0</div>
+          </div>
+        </div>
+
+        <div class="task-list task-list-2">
+          <div class="task">
+            <div class="icon-task">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="task-details">
+              <span class="task-title">เข้างานปกติ</span>
+            </div>
+            <div class="task-badge" id="countingCheckinB">0</div>
+          </div>
+        </div>
+
+        <div class="task-list task-list-3">
+          <div class="task">
+            <div class="icon-task">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="task-details">
+              <span class="task-title">เข้างานสาย</span>
+            </div>
+            <div class="task-badge" id="countingCheckinC">0</div>
+          </div>
+        </div>
+
+        <div class="task-list task-list-4">
+          <div class="task">
+            <div class="icon-task">
+              <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div class="task-details">
+              <span class="task-title">ขาดงาน</span>
+            </div>
+            <div class="task-badge" id="countingCheckinD">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="col-12">📝 ภาพรวมการลา</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="TableLeaveTypes"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const openCamera = async () => {
+  try {
+    const constraints = {
+      video: {
+        facingMode: currentFacingMode
+      }
+    };
+    
+    if (/Android/i.test(navigator.userAgent)) {
+      constraints.video = {
+        facingMode: currentFacingMode,
+        width: { ideal: 1280, max: 1920 },
+        height: { ideal: 720, max: 1080 }
+      };
+    }
+
+    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('cameraVideo');
+    video.srcObject = cameraStream;
+
+    video.addEventListener('loadedmetadata', () => {
+      video.play();
+    });
+  } catch (err) {
+    console.error('Error accessing camera:', err);
+    createToast('❌ ไม่สามารถเข้าถึงกล้องได้', 0);
+  }
+};
+
+const switchCamera = async () => {
+  try {
+    await navigator.mediaDevices.getUserMedia({ video: true });
+    
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+    }
+
+    currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+
+    const constraints = {
+      video: {
+        facingMode: { exact: currentFacingMode },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    };
+
+    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('cameraVideo');
+    video.srcObject = cameraStream;
+    await video.play();
+    
+  } catch (err) {
+    console.error('Error switching camera:', err);
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: currentFacingMode }
+      });
+      const video = document.getElementById('cameraVideo');
+      video.srcObject = cameraStream;
+      await video.play();
+    } catch (fallbackErr) {
+      createToast('❌ ไม่สามารถสลับกล้องได้', 0);
+    }
+  }
+};
+
+const stopCamera = () => {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+  document.getElementById('cameraVideo').srcObject = null;
+  document.getElementById('capturedImage').style.display = 'none';
+  document.getElementById('cameraVideo').style.display = 'block';
+  document.getElementById('captureBtn').style.display = 'block';
+  document.getElementById('recaptureBtn').style.display = 'none';
+  document.getElementById('cameraSection').classList.add('d-none');
+  capturedImageData = null;
+};
+
+const captureImage = () => {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  const capturedImage = document.getElementById('capturedImage');
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+  capturedImage.src = capturedImageData;
+
+  video.style.display = 'none';
+  capturedImage.style.display = 'block';
+  document.getElementById('captureBtn').style.display = 'none';
+  document.getElementById('recaptureBtn').style.display = 'block';
+};
+
+const recaptureImage = () => {
+  const video = document.getElementById('cameraVideo');
+  const capturedImage = document.getElementById('capturedImage');
+
+  video.style.display = 'block';
+  capturedImage.style.display = 'none';
+  document.getElementById('captureBtn').style.display = 'block';
+  document.getElementById('recaptureBtn').style.display = 'none';
+  capturedImageData = null;
+};
+
+const checkCameras = async () => {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      document.getElementById('switchCameraBtn').style.display = 'block';
+      return;
+    }
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices.filter(device => device.kind === 'videoinput');
+    const switchCameraBtn = document.getElementById('switchCameraBtn');
+
+    if (cameras.length > 1 || /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      switchCameraBtn.style.display = 'block';
+    } else {
+      switchCameraBtn.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('Error checking cameras:', err);
+    document.getElementById('switchCameraBtn').style.display = 'block';
+  }
+};
+
+let lateTime = null;
+let outtime = null;
+
+const loadShiftTimes = () => {
+  if (allsetTime && allsetTime.length > 0) {
+    allsetTime.forEach(row => {
+      if (row[3] === "TRUE") {
+        const now = new Date();
+        lateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(row[1].split(':')[0]), parseInt(row[1].split(':')[1]), 0);
+        outtime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(row[2].split(':')[0]), parseInt(row[2].split(':')[1]), 0);
+        const shiftTimesElement = document.getElementById('shiftTimes');
+        if (shiftTimesElement) {
+          shiftTimesElement.innerHTML = `🕒 <span style="color: ${now >= lateTime ? 'var(--box4)' : 'inherit'};">${row[1]}</span> | 🕒 <span style="color: ${now >= outtime ? 'var(--box4)' : 'inherit'};">${row[2]}</span>`;
+        } else {
+          console.error("ไม่สามารถดึงข้อมูลเวลาเข้าออกงานได้");
+        }
+      }
+    });
+  }
+};
+
+const updateDateTime = () => { 
+  const now = new Date();
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  const dateString = now.toLocaleDateString('th-TH', options);
+  document.getElementById('currentdate').textContent = dateString;
+};
+setInterval(updateDateTime, 1000);
+
+let locations = [];
+let canCheckIn = false;
+
+const getDataLocation = () => {
+  google.script.run.withSuccessHandler((data) => {
+    locations = data;
+    checkUserLocation();
+  }).getLocationCheckIn();
+};
+
+const updateLocation = (lat, lng) => {
+  document.getElementById('location').textContent = `🌏 ${lat.toFixed(6)} : ${lng.toFixed(6)}`;
+};
+
+const checkUserLocation = () => { 
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const userLat = position.coords.latitude;
+      const userLng = position.coords.longitude;
+
+      updateLocation(userLat, userLng);
+      const userLatLng = L.latLng(userLat, userLng);
+
+      if (selectedBranch) {
+        const branchLatLng = L.latLng(parseFloat(selectedBranch[4]), parseFloat(selectedBranch[5]));
+        const distance = userLatLng.distanceTo(branchLatLng);
+
+        if (distance <= 250) {
+          canCheckIn = true;
+          createToast("✅ คุณสามารถลงเวลาได้", 1);
+          document.getElementById('cameraSection').classList.remove('d-none');
+          openCamera();
+        } else {
+          canCheckIn = false;
+          const distanceToMove = (distance - 250).toFixed(2);
+          createToast(`⚠️ อยู่นอกเขตพื้นที่ (อีก ${distanceToMove} เมตร)`, 3);
+          stopCamera();
+          document.getElementById('cameraSection').classList.add('d-none');
+        }
+      }
+    }, (error) => {
+      console.error("Error getting location: ", error);
+      createToast("❌ ไม่สามารถเข้าถึงตำแหน่งของคุณได้", 0);
+      stopCamera();
+      document.getElementById('cameraSection').classList.add('d-none');
+    });
+  } else {
+    createToast("❌ เบราว์เซอร์ไม่รองรับการระบุตำแหน่ง", 0);
+    stopCamera();
+    document.getElementById('cameraSection').classList.add('d-none');
+  }
+};
+
+const isTodayDayOff = () => { 
+  const today = new Date();
+  const todayDayIndex = today.getDay();
+
+  const isWeeklyDayOff = allSetWeekEnd.some(dayOff => {
+    const [id, dayOfWeek, status] = dayOff;
+    const dayIndexMapping = {
+      'อาทิตย์': 0,
+      'จันทร์': 1,
+      'อังคาร': 2,
+      'พุธ': 3,
+      'พฤหัสบดี': 4,
+      'ศุกร์': 5,
+      'เสาร์': 6
+    };
+    return status === 'TRUE' && dayIndexMapping[dayOfWeek] === todayDayIndex;
+  });
+
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = today.getFullYear();
+  const todayFormatted = `${day}/${month}/${year}`;
+  const isSetDayOff = allSetDayOff.some(dayOff => {
+    const [day, month, year] = dayOff[1].split('/');
+    const formattedDayOff = `${day}/${month}/${year}`;
+    return formattedDayOff === todayFormatted;
+  });
+
+  const isDayOff = isWeeklyDayOff || isSetDayOff;
+  return isDayOff;
+};
+
+const submitCheckInTime = (status) => {
+  event.preventDefault();
+
+  if (!selectedBranch) {
+    createToast("⚠️ กรุณาเลือกสาขาก่อนลงเวลา", 3);
+    return;
+  }
+
+  if (!canCheckIn) {
+    createToast("❌ คุณอยู่นอกเขตรัศมี ไม่สามารถลงเวลาได้", 0);
+    return;
+  }
+
+  if (!capturedImageData) {
+    createToast("⚠️ กรุณาถ่ายรูปก่อนลงเวลา", 3);
+    return;
+  }
+
+  const now = new Date();
+  if (status === 'เข้างาน' && now > lateTime) {
+    status = 'สาย';
+  } else if (status === 'ออกงาน' && now < outtime) {
+    $('#SetCheckinModal').modal('show');
+    $('#branchSelectModal').modal('hide');
+    return;
+  }
+
+  sendCheckinData(status); 
+};
+
+const sendCheckinData = async (status) => {
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+  const now = new Date();
+  const today = now.toLocaleDateString("en-GB");
+  const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+
+  const checkinuid = document.getElementById('user-show0').innerText;
+  const checkinfullname = document.getElementById('user-show1').innerText;
+
+  const obj = {
+    checkinuid: checkinuid,
+    checkinfullname: checkinfullname,
+    checkinTime: timeString,
+    status: status,
+    branch: selectedBranch[0],
+    ipAddress: await getIPAddress(),
+    deviceId: localStorage.getItem('deviceId') || generateDeviceId(),
+    imageDataUrl: capturedImageData,
+    filetype: 'image/jpeg',
+    filename: `checkin_${checkinuid}_${today.replace(/\//g, '')}_${timeString.replace(/:/g, '')}.jpg`,
+    datacheck: capturedImageData ? "1" : ""
+  };
+
+  if (!obj.checkinuid || !obj.checkinfullname) {
+    createToast("⚠️ กรุณากรอกข้อมูลให้ครบถ้วน", 3);
+    $.LoadingOverlay("hide");
+    return;
+  }
+
+  if (status === 'ออกงาน') {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      createToast("✅ ลงเวลาออกงานสำเร็จ", 2);
+      $('#branchSelectModal').modal('hide');
+      stopCamera();
+      updateCheckinStatus(status);
+    }).userDataCheckin(obj);
+    return;
+  }
+
+  const isUIDDuplicate = alltimeAttendance.some(row => {
+    const [scanDate, uid] = row;
+    const dateMatch = scanDate === today;
+    const uidMatch = uid === obj.checkinuid;
+    return dateMatch && uidMatch;
+  });
+
+  if (isUIDDuplicate) {
+    $.LoadingOverlay("hide");
+    createToast("⚠️ UID นี้ได้ลงเวลาในวันนี้ไปแล้ว ไม่สามารถลงเวลาได้อีก", 0);
+    stopCamera();
+    return;
+  }
+
+  const isDeviceDuplicate = alltimeAttendance.some(row => {
+    const [scanDate, , , , , , , deviceId] = row;
+    const dateMatch = scanDate === today;
+    const deviceIdMatch = deviceId === obj.deviceId;
+    return dateMatch && deviceIdMatch;
+  });
+
+  if (isDeviceDuplicate) {
+    $.LoadingOverlay("hide");
+    createToast("⚠️ อุปกรณ์นี้ได้ลงเวลาในวันนี้ไปแล้ว ไม่สามารถลงเวลาได้อีก", 0);
+    stopCamera();
+    return;
+  }
+
+  google.script.run.withSuccessHandler(async (res) => {
+    $.LoadingOverlay("hide");
+    createToast("✅ ลงเวลาสำเร็จ", 2);
+    $('#branchSelectModal').modal('hide');
+    stopCamera();
+    updateCheckinStatus(status);
+  }).userDataCheckin(obj);
+};
+
+const updateCheckinStatus = (status) => {
+  const isDayOff = isTodayDayOff();
+  if (status === 'เข้างาน') {
+    document.getElementById('checkin-button').style.display = 'none';
+    document.getElementById('ot-button').style.display = 'none';
+  } else if (status === 'ออกงาน') {
+    if (isDayOff) {
+      document.getElementById('checkin-button').style.display = 'none';
+      document.getElementById('ot-button').style.display = 'block';
+    } else {
+      document.getElementById('checkin-button').style.display = 'block';
+      document.getElementById('ot-button').style.display = 'none';
+    }
+  } else if (status === 'OT') {
+    document.getElementById('checkin-button').style.display = 'none';
+    document.getElementById('ot-button').style.display = 'block';
+  }
+  document.querySelectorAll('.leavelist-item').forEach(item => item.classList.remove('selected'));
+  selectedBranch = null;
+  document.getElementById('cameraSection').classList.add('d-none');
+  loadCheckinStatus();
+};
+
+const confirmSetCheckin = () => {
+  $('#SetCheckinModal').modal('hide');
+  sendCheckinData('ออกงาน');
+};
+
+const closeSetCheckin = () => {
+  $('#SetCheckinModal').modal('hide');
+  $('#branchSelectModal').modal('show');
+};
+
+const loadCheckinStatus = () => { 
+  const isDayOff = isTodayDayOff(); 
+
+  const checkinButton = document.getElementById('checkin-button');
+  const otButton = document.getElementById('ot-button');
+
+  if (isDayOff) {
+    checkinButton.style.display = 'none';
+    otButton.style.display = 'block';
+  } else {
+    checkinButton.style.display = 'block';
+    otButton.style.display = 'none';
+  }
+
+  document.getElementById('cameraSection').classList.add('d-none');
+};
+
+const loadLeaveTypes = () => {
+  if (allsetLeave.length === 0) return;
+
+  const leaveContainer = document.getElementById('TableLeaveTypes');
+  leaveContainer.innerHTML = '';
+  
+  allsetLeave.forEach(row => {
+    const id = row[0];
+    const type = row[1];
+    const amount = parseInt(row[2]);
+    const status = row[3];
+
+    if (status === 'TRUE') {
+      let userLeaves = allleave.filter(leave => leave[3] === leaveUserUID && leave[8] === type && leave[1] === 'อนุมัติ');
+      let totalHours = userLeaves.reduce((total, leave) => total + (parseInt(leave[13]) * 24) + parseInt(leave[14]), 0);
+      let usedDays = Math.floor(totalHours / 24);
+      let remaining = amount - usedDays;
+      let percentage = (usedDays / amount) * 100;
+
+      let imgLeaveTypes = '';
+      switch (type) {
+        case 'ลาป่วยมีใบรับรองแพทย์':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/bed-leave.png';
+          break;
+        case 'ลาป่วยไม่มีใบรับรองแพทย์':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/fever-leave.png';
+          break;
+        case 'ลากิจจำเป็น':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/leave.png';
+          break;
+        case 'ลากิจทั่วไป':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/training-leave.png';
+          break;
+        case 'ลาพักร้อน':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/beach-chair-leave.png';
+          break;
+        case 'ลาบวช':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/monk-leave.png';
+          break;
+        case 'ลาคลอด':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/mother-leave.png';
+          break;
+        case 'ลารับราชการทหาร':
+          imgLeaveTypes = 'https://raw.githubusercontent.com/EPICCODING17/Icons/main/soldier-leave.png';
+          break;
+        default:
+          imgLeaveTypes = 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+      }
+
+      const leaveItem = `
+        <div class="user-item-set d-flex align-items-center mb-2" data-leavetype="${type}" onclick="selectLeaveType('${type}', this)">
+          <img src="${imgLeaveTypes}" alt="${type}" class="me-2" width="40" height="40">
+          <div class="leave-info d-flex flex-column w-100">
+            <div class="d-flex justify-content-between align-items-center">
+              <strong>${type}</strong>
+            </div>
+            <small>จำนวนการลา ${usedDays}/${amount} วัน</small>
+            <div class="progress-Set mt-1">
+              <div class="progress-bar-Set" role="progressbar" style="width: ${percentage}%" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      leaveContainer.insertAdjacentHTML('beforeend', leaveItem);
+    }
+  });
+}
+
+const monthsLev = [
+  "มกราคม",
+  "กุมภาพันธ์",
+  "มีนาคม",
+  "เมษายน",
+  "พฤษภาคม",
+  "มิถุนายน",
+  "กรกฎาคม",
+  "สิงหาคม",
+  "กันยายน",
+  "ตุลาคม",
+  "พฤศจิกายน",
+  "ธันวาคม",
+];
+const daysOfWeekLev = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth();
+const years = [];
+for (let i = currentYear; i <= currentYear + 3; i++) {
+  years.push(i);
+}
+
+document.getElementById("yearSelect").innerHTML = years
+  .map((year) => `<option value="${year}" ${year == currentYear ? 'selected' : ''}>${year}</option>`) 
+  .join("");
+
+document.getElementById("monthSelect").innerHTML = monthsLev
+  .map((month, index) => `<option value="${index}" ${index == currentMonth ? 'selected' : ''}>${month}</option>`) 
+  .join("");
+
+document.getElementById("yearTimeAttendance").innerHTML = years
+  .map(year => `<option value="${year}" ${year === currentYear ? 'selected' : ''}>${year}</option>`)
+  .join("");
+
+document.getElementById("monthTimeAttendance").innerHTML = monthsLev
+  .map((month, index) => `<option value="${index}" ${index === currentMonth ? 'selected' : ''}>${month}</option>`)
+  .join("");
+
+const updateCalendarLev = () => {
+  const year = document.getElementById("yearSelect").value;
+  const month = document.getElementById("monthSelect").value;
+  filterAndRenderCalendarLev(year, month);
+};
+
+const filterAndRenderCalendarLev = (year, month) => {
+  const filteredData = allCalendarLev.filter((row) => {
+    const startDateTime = new Date(row[11]);
+    const endDateTime = new Date(row[12]);
+    const start = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+    const end = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
+    return (start.getFullYear() == year && start.getMonth() == month) || (end.getFullYear() == year && end.getMonth() == month);
+  });
+  renderCalendarLev(filteredData);
+};
+
+// const renderCalendarLev = (data) => {
+//   const year = document.getElementById("yearSelect").value;
+//   const month = document.getElementById("monthSelect").value;
+//   const daysInMonth = new Date(year, parseInt(month) + 1, 0).getDate();
+
+//   let monthHeaderHtml = `<th id="monthHeaderLev" scope="col" class="text-center" colspan="${daysInMonth + 4}">ประจำเดือน ${monthsLev[month]}</th>`;
+//   document.getElementById("monthHeaderLev").outerHTML = monthHeaderHtml;
+
+//   let dayHeadersHtml = "";
+//   for (let i = 1; i <= daysInMonth; i++) {
+//     const day = new Date(year, month, i).getDay();
+//     const isWeekend = day === 0 || day === 6;
+//     dayHeadersHtml += `<th scope="col" class="text-center ${isWeekend ? 'bg-danger-subtle' : ''}">${i}<br><span class="text-dark">${daysOfWeekLev[day]}</span></th>`;
+//   }
+//   document.getElementById("monthDaysLev").innerHTML = dayHeadersHtml;
+
+//   const tableBody = document.getElementById("tableCalendarLev");
+//   tableBody.innerHTML = "";
+
+//   if (data.length === 0) {
+//     tableBody.innerHTML = `<tr><td colspan='${daysInMonth + 4}' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td></tr>`;
+//     return;
+//   }
+
+//   data.sort((a, b) => {
+//     const numA = parseInt(a[3].replace('USER-', ''));
+//     const numB = parseInt(b[3].replace('USER-', ''));
+//     return numA - numB;
+//   });
+
+//   const uniqueUsers = Array.from(new Set(data.map(row => row[3])));
+//   uniqueUsers.forEach((userId, index) => {
+//     const userLeaves = data.filter(row => row[3] === userId);
+//     const firstRow = userLeaves[0];
+//     let user = dataUsers && dataUsers.find(user => user[0] === firstRow[3]);
+//     let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+//     let rowHtml = `
+//     <tr>
+//       <td>
+//         <div style="display: flex; align-items: center;">
+//           <img src="${userImage}" alt="ImageUsers" width="30" style="margin-right: 10px;" style="border-radius: 50%;">
+//           <div style="font-size: 14px;">
+//             <span>UID: ${firstRow[3]}</span><br>
+//             <span>ชื่อ: ${firstRow[4]}</span><br>
+//             <span>ตำแหน่ง: ${firstRow[5]}</span>
+//           </div>
+//         </div>
+//       </td>
+//     `;
+//     for (let i = 1; i <= daysInMonth; i++) {
+//       const day = new Date(year, month, i);
+//       const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+//       let leaveStatus = `<span class='badge bg-light text-muted'>-</span>`;
+//       userLeaves.forEach((row) => {
+//         const startDateTime = new Date(row[11]);
+//         const endDateTime = new Date(row[12]);
+//         const start = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+//         const end = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
+//         if (day >= start && day <= end) {
+//           let currentLeaveStatus = "";
+//           switch (row[8]) {
+//             case "ลาป่วยมีใบรับรองแพทย์":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ป</span>`;
+//               break;
+//             case "ลาป่วยไม่มีใบรับรองแพทย์":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ป*</span>`;
+//               break;
+//             case "ลากิจทั่วไป":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ก</span>`;
+//               break;
+//             case "ลากิจจำเป็น":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">จ</span>`;
+//               break;
+//             case "ลาพักร้อน":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">พ</span>`;
+//               break;
+//             case "ลาบวช":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">บ</span>`;
+//               break;
+//             case "ลาคลอด":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ค</span>`;
+//               break;
+//             case "ลารับราชการทหาร":
+//               currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ท</span>`;
+//               break;
+//           }
+//           if (leaveStatus.includes('text-muted')) {
+//             leaveStatus = currentLeaveStatus;
+//           } else {
+//             leaveStatus += "<br>" + currentLeaveStatus;
+//           }
+//         }
+//       });
+//       rowHtml += `<td class="text-center ${isWeekend ? 'bg-danger-subtle' : ''}">${leaveStatus}</td>`;
+//     }
+//     rowHtml += `</tr>`;
+//     tableBody.innerHTML += rowHtml;
+//   });
+// };
+
+const renderCalendarLev = (data) => {
+  const year = document.getElementById("yearSelect").value;
+  const month = document.getElementById("monthSelect").value;
+  const daysInMonth = new Date(year, parseInt(month) + 1, 0).getDate();
+
+  let monthHeaderHtml = `<th id="monthHeaderLev" scope="col" class="text-center" colspan="${daysInMonth + 4}">ประจำเดือน ${monthsLev[month]}</th>`;
+  document.getElementById("monthHeaderLev").outerHTML = monthHeaderHtml;
+
+  let dayHeadersHtml = "";
+  for (let i = 1; i <= daysInMonth; i++) {
+    const day = new Date(year, month, i).getDay();
+    const isWeekend = day === 0 || day === 6;
+    dayHeadersHtml += `<th scope="col" class="text-center ${isWeekend ? 'bg-danger-subtle' : ''}">${i}<br><span class="text-dark">${daysOfWeekLev[day]}</span></th>`;
+  }
+  document.getElementById("monthDaysLev").innerHTML = dayHeadersHtml;
+
+  const tableBody = document.getElementById("tableCalendarLev");
+  tableBody.innerHTML = "";
+
+  if (data.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan='${daysInMonth + 4}' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td></tr>`;
+    return;
+  }
+
+  data.sort((a, b) => {
+    const numA = parseInt(a[3].replace('USER-', ''));
+    const numB = parseInt(b[3].replace('USER-', ''));
+    return numA - numB;
+  });
+
+  const uniqueUsers = Array.from(new Set(data.map(row => row[3])));
+  uniqueUsers.forEach((userId, index) => {
+    const userLeaves = data.filter(row => row[3] === userId);
+    const firstRow = userLeaves[0];
+    let user = dataUsers && dataUsers.find(user => user[0] === firstRow[3]);
+    let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+    let rowHtml = `
+    <tr>
+      <td>
+        <div style="display: flex; align-items: center;">
+          <img src="${userImage}" alt="ImageUsers" width="30" style="margin-right: 10px;" style="border-radius: 50%;">
+          <div style="font-size: 14px;">
+            <span>UID: ${firstRow[3]}</span><br>
+            <span>ชื่อ: ${firstRow[4]}</span><br>
+            <span>ตำแหน่ง: ${firstRow[5]}</span>
+          </div>
+        </div>
+      </td>
+    `;
+    for (let i = 1; i <= daysInMonth; i++) {
+      const day = new Date(year, month, i);
+      const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+      let leaveStatus = `<span class='badge bg-light text-muted'>-</span>`;
+      
+      userLeaves.forEach((row) => {
+        const startDateTime = new Date(row[11]);
+        const totalDays = parseInt(row[13]); // จำนวนวันลารวม
+        
+        // วนลูปตามจำนวนวันที่ลา
+        for(let leaveDay = 0; leaveDay < totalDays; leaveDay++) {
+          const currentLeaveDate = new Date(startDateTime);
+          currentLeaveDate.setDate(startDateTime.getDate() + leaveDay);
+          
+          // เปรียบเทียบวันที่
+          if (
+            day.getFullYear() === currentLeaveDate.getFullYear() &&
+            day.getMonth() === currentLeaveDate.getMonth() &&
+            day.getDate() === currentLeaveDate.getDate()
+          ) {
+            let currentLeaveStatus = "";
+            switch (row[8]) {
+              case "ลาป่วยมีใบรับรองแพทย์":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ป</span>`;
+                break;
+              case "ลาป่วยไม่มีใบรับรองแพทย์":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ป*</span>`;
+                break;
+              case "ลากิจทั่วไป":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ก</span>`;
+                break;
+              case "ลากิจจำเป็น":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">จ</span>`;
+                break;
+              case "ลาพักร้อน":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">พ</span>`;
+                break;
+              case "ลาบวช":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">บ</span>`;
+                break;
+              case "ลาคลอด":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ค</span>`;
+                break;
+              case "ลารับราชการทหาร":
+                currentLeaveStatus = `<span class="badge" style="background-color: ${row[1] === 'อนุมัติ' ? 'var(--box2)' : row[1] === 'รอตรวจสอบ' ? 'var(--box3)' : 'var(--box4)'}">ท</span>`;
+                break;
+              default:
+                currentLeaveStatus = `<span class="badge" style="background-color: var(--box4)">อ</span>`;
+                break;
+            }
+            if (leaveStatus.includes('text-muted')) {
+              leaveStatus = currentLeaveStatus;
+            } else {
+              leaveStatus += "<br>" + currentLeaveStatus;
+            }
+          }
+        }
+      });
+      rowHtml += `<td class="text-center ${isWeekend ? 'bg-danger-subtle' : ''}">${leaveStatus}</td>`;
+    }
+    rowHtml += `</tr>`;
+    tableBody.innerHTML += rowHtml;
+  });
+};
+
+const updateCountsCheckIN = () => {
+  const selectedYear = parseInt(document.getElementById("yearTimeAttendance").value);
+  const selectedMonth = parseInt(document.getElementById("monthTimeAttendance").value);
+
+  const useruid = alltimeAttendance.filter(row => {
+    const [day, month, year] = row[0].split("/").map(Number);
+    return (
+      row[1] === leaveUserUID &&
+      year === selectedYear &&
+      month - 1 === selectedMonth
+    );
+  });
+
+  const countingCheckinA = useruid.length;
+
+  const standardTimeEntry = allsetTime.find(row => row[3] === "TRUE");
+  const standardCheckinTime = standardTimeEntry ? standardTimeEntry[1] : null;
+
+  if (!standardCheckinTime) {
+    console.error("ไม่พบค่าเวลาเช็คอินมาตรฐานใน allsetTime");
+    return;
+  }
+
+  const isOnTime = (checkInTime, standardTime) => {
+    const [checkInHours, checkInMinutes] = checkInTime.split(":").map(Number);
+    const [standardHours, standardMinutes] = standardTime.split(":").map(Number);
+    return (
+      checkInHours < standardHours ||
+      (checkInHours === standardHours && checkInMinutes <= standardMinutes)
+    );
+  };
+
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+  // สร้างรายการวันที่สำหรับวันหยุดสุดสัปดาห์
+  const allSetWeekEndDates = [];
+  const startDate = new Date(selectedYear, selectedMonth, 1);
+  const endDate = new Date(selectedYear, selectedMonth, daysInMonth);
+
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    const dayOfWeek = d.getDay();
+    const isWeekendDayOff = allSetWeekEnd.some(dayOff => {
+      const [id, dayName, status] = dayOff;
+      return status === 'TRUE' && dayName === ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'][dayOfWeek];
+    });
+    if (isWeekendDayOff) allSetWeekEndDates.push(new Date(d));
+  }
+
+  // สร้างรายการวันที่สำหรับวันหยุดพิเศษ
+  const allSetDayOffDates = allSetDayOff.map(dayOff => new Date(dayOff[1].split("/").reverse().join("-")));
+
+  // ฟังก์ชันตรวจสอบว่าเป็นวันหยุดหรือไม่ (ทั้งวันหยุดสุดสัปดาห์และวันหยุดพิเศษ)
+  const isHoliday = date => {
+    const isWeekend = allSetWeekEndDates.some(weekendDate => 
+      weekendDate.getDate() === date.getDate() &&
+      weekendDate.getMonth() === date.getMonth() &&
+      weekendDate.getFullYear() === date.getFullYear()
+    );
+    const isSpecialDayOff = allSetDayOffDates.some(dayOffDate =>
+      dayOffDate.getDate() === date.getDate() &&
+      dayOffDate.getMonth() === date.getMonth() &&
+      dayOffDate.getFullYear() === date.getFullYear()
+    );
+    return isWeekend || isSpecialDayOff;
+  };
+
+  // กำหนดเงื่อนไขให้การเข้างานในวันหยุดนับเป็นการเข้างานปกติ
+  const countingCheckinB = useruid.filter(row => {
+    const checkInDate = new Date(selectedYear, selectedMonth, parseInt(row[0].split("/")[0]));
+    return isHoliday(checkInDate) || isOnTime(row[3], standardCheckinTime);
+  }).length;
+
+  // กำหนดการเข้างานสายโดยไม่นับรวมวันหยุด
+  const countingCheckinC = useruid.filter(row => {
+    const checkInDate = new Date(selectedYear, selectedMonth, parseInt(row[0].split("/")[0]));
+    return !isHoliday(checkInDate) && !isOnTime(row[3], standardCheckinTime);
+  }).length;
+
+  const today = new Date();
+  const absentDays = Array.from({ length: daysInMonth }, (_, i) => i + 1).filter(day => {
+    const date = new Date(selectedYear, selectedMonth, day);
+
+    // ถ้าวันที่ในเดือนปัจจุบันยังไม่ถึงวันนี้ ก็ไม่ต้องนับขาดงาน
+    if (date > today) return false;
+
+    // ตรวจสอบว่าวันนี้เป็นวันหยุดหรือไม่
+    return !isHoliday(date) && !useruid.some(row => parseInt(row[0].split("/")[0]) === day);
+  });
+
+  const countingCheckinD = absentDays.length;
+
+  document.getElementById('countingCheckinA').innerText = countingCheckinA;
+  document.getElementById('countingCheckinB').innerText = countingCheckinB;
+  document.getElementById('countingCheckinC').innerText = countingCheckinC;
+  document.getElementById('countingCheckinD').innerText = countingCheckinD;
+}
+
+const showHolidayModal = () => {
+  $('#holidayModal').modal('show');
+
+  const holidayList = $('#holidayList');
+  holidayList.empty();
+  const selectedYear = parseInt(document.getElementById("selectYearModal").value);
+  const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+  const thaiDays = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+
+  const groupedHolidays = {};
+
+  // กรองข้อมูลตามปีที่เลือก
+  allSetDayOff.forEach(row => {
+    const holidayDateStr = row[1];  // วันที่ในรูปแบบ "DD/MM/YYYY"
+    const description = row[2];  // รายละเอียดวันหยุด
+
+    // แยกวัน เดือน ปีจาก holidayDateStr
+    const [day, month, year] = holidayDateStr.split('/').map(Number);
+    if (!day || !month || !year || year !== selectedYear) return;  // ข้ามถ้าไม่มีข้อมูลครบหรือปีไม่ตรงกับที่เลือก
+
+    // สร้าง Date Object
+    const date = new Date(year, month - 1, day);
+    const monthIndex = date.getMonth();
+    const dayOfWeek = date.getDay();
+
+    if (!groupedHolidays[monthIndex]) {
+      groupedHolidays[monthIndex] = [];
+    }
+    groupedHolidays[monthIndex].push({
+      day: day,
+      dayName: thaiDays[dayOfWeek],
+      name: description,
+    });
+  });
+
+  let totalHolidays = 0;
+
+  // ตรวจสอบว่ามีวันหยุดหรือไม่
+  if (Object.keys(groupedHolidays).length === 0) {
+    holidayList.append('<h5 class="text-center mt-2" style="color: var(--box4); font-weight: bold;">❌ ไม่พบข้อมูลวันหยุดพิเศษ</h5>');
+  } else {
+    // แสดงรายการวันหยุด
+    $.each(groupedHolidays, (monthIndex, monthHolidays) => {
+      const monthName = thaiMonths[parseInt(monthIndex)];
+
+      const monthGroup = $(`
+        <div class="holiday-group">
+          <h4>ประจำเดือน${monthName}</h4>
+        </div>
+      `);
+
+      monthHolidays.forEach(holiday => {
+        const holidayItem = $(`
+          <div class="holiday-item">
+            <div class="holiday-date">${holiday.day}</div>
+            <div class="holiday-details">
+              <div class="day">${holiday.dayName}</div>
+              <div class="name">${holiday.name}</div>
+            </div>
+          </div>
+        `);
+        monthGroup.append(holidayItem);
+      });
+
+      holidayList.append(monthGroup);
+      totalHolidays += monthHolidays.length;
+    });
+  }
+
+  $('#totalHolidays').text(totalHolidays);
+};
+
+const insertChartLev = () => {
+  let leaveCounts = new Map([
+    ["ลาป่วยมีใบรับรองแพทย์", 0],
+    ["ลาป่วยไม่มีใบรับรองแพทย์", 0],
+    ["ลากิจจำเป็น", 0],
+    ["ลากิจทั่วไป", 0],
+    ["ลาพักร้อน", 0],
+    ["ลาบวช", 0],
+    ["ลาคลอด", 0],
+    ["ลารับราชการทหาร", 0]
+  ]);
+
+  const colors = ['#3c8cf3', '#05be8a', '#745af2', '#ef5350', '#f39c12', '#00a65a', '#d2d6de', '#d81b60'];
+
+  const userLeaves = allleave.filter(item => item[3] === leaveUserUID);
+
+  userLeaves.forEach((item) => {
+    let leaveType = item[8];
+    if (leaveCounts.has(leaveType)) {
+      leaveCounts.set(leaveType, leaveCounts.get(leaveType) + 1);
+    }
+  });
+
+  let seriesData = Array.from(leaveCounts.values());
+  let categories = Array.from(leaveCounts.keys());
+
+  var options = {
+    series: seriesData,
+    chart: {
+      height: 280,
+      type: 'pie'
+    },
+    labels: categories,
+    colors: colors,
+    dataLabels: {
+      enabled: true
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return val + " ครั้ง";
+        }
+      }
+    },
+    fill: {
+      colors: colors,
+    }
+  };
+
+  // ตรวจสอบและลบกราฟเก่าถ้ามี
+  const chartElement = document.querySelector("#chartLev");
+  if (chartElement.innerHTML) {
+    chartElement.innerHTML = "";
+  }
+
+  var chart = new ApexCharts(chartElement, options);
+  chart.render();
+};
+</script>
