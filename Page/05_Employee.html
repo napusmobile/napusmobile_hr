@@ -1,0 +1,392 @@
+<div class="row g-3 mt-2">
+  <div class="col-12 col-lg-12 col-xl-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">👦 จัดการข้อมูลพนักงาน</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+            <input type="search" class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" id="searchEmployee" placeholder="🔍ค้นหาพนักงาน..." oninput="filterEmployee()">
+          </div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">ชื่อพนักงาน</th>
+                <th scope="col" class="text-center">การจ้างงาน</th>
+                <th scope="col" class="text-center">ช่องทำการชำระ</th>
+                <th scope="col" class="text-center">ติดต่อ</th>
+                <th scope="col" class="text-center">สถานะ</th>
+                <th scope="col" class="text-center">สมบูรณ์</th>
+                <th scope="col" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableEmployee">
+              <tr>
+                <td colspan='8' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>
+              </tr>
+            </tbody>       
+          </table>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0 align-items-center" id="paginationEmployeeInfo"></div>
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div id="paginationEmployee" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const renderEmployee = (res) => {
+  const table = document.getElementById('tableEmployee');
+  table.innerHTML = '';
+
+  res.sort((a, b) => {
+    const numA = parseInt(a[0].replace('USER-', ''));
+    const numB = parseInt(b[0].replace('USER-', ''));
+    return numA - numB;
+  });
+
+  if (res.length === 0) {
+    const row = table.insertRow();
+    row.innerHTML = `<td colspan='8' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>`;
+    return;
+  }
+
+  res.forEach((rowIndex, index) => {
+    let isActive = rowIndex[10] === "TRUE";
+    if (rowIndex[10] === 'TRUE') {
+      const checkrowIndex = [rowIndex[11], rowIndex[12], rowIndex[13], rowIndex[14], rowIndex[15], rowIndex[16], rowIndex[17], rowIndex[18], rowIndex[19], rowIndex[20], rowIndex[21], rowIndex[22], rowIndex[23], rowIndex[24], rowIndex[25], rowIndex[26], rowIndex[27], rowIndex[28], rowIndex[29], rowIndex[30], rowIndex[31], rowIndex[32]];
+      const filledFields = checkrowIndex.filter(field => field && field.trim() !== '').length;
+      const progressbar = Math.round((filledFields / checkrowIndex.length) * 100);
+      const progressAngle = progressbar * 3.6;
+
+      let progressColor;
+      let buttonClass = 'upload-button';
+      if (progressbar <= 25) {
+        progressColor = 'var(--box4)';
+        buttonClass = 'del-button';
+      } else if (progressbar <= 50) {
+        progressColor = 'var(--box3)';
+        buttonClass = 'edit-button';
+      } else if (progressbar <= 75) {
+        progressColor = 'var(--box1)';
+        buttonClass = 'set-button';
+      } else {
+        progressColor = 'var(--box2)';
+        buttonClass = 'upload-button';
+      }
+
+      let bankImage = '';
+      switch (rowIndex[24]) {
+        case 'ธนาคารกรุงเทพ':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-1.png';
+          break;
+        case 'ธนาคารกสิกรไทย':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-2.png';
+          break;
+        case 'ธนาคารกรุงไทย':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-3.png';
+          break;
+        case 'ธนาคารทหารไทย':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-4.png';
+          break;
+        case 'ธนาคารไทยพาณิชย์':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-5.png';
+          break;
+        case 'ธนาคารกรุงศรีอยุธยา':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-6.png';
+          break;
+        case 'ธนาคารเกียรตินาคิน':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-7.png';
+          break;
+        case 'ธนาคารซีไอเอ็มบีไทย':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-8.png';
+          break;
+        case 'ธนาคารทิสโก้':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-9.png';
+          break;
+        case 'ธนาคารธนชาต':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-10.png';
+          break;
+        case 'ธนาคารยูโอบี':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-11.png';
+          break;
+        case 'ธนาคารไอซีบีซี(ไทย)':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-12.png';
+          break;
+        case 'ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-13.png';
+          break;
+        case 'ธนาคารออมสิน':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-14.png';
+          break;
+        case 'ธนาคารอาคารสงเคราะห์':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-15.png';
+          break;
+        case 'ธนาคารอิสลามแห่งประเทศไทย':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-16.png';
+          break;
+        case 'ธนาคารไทยเครดิตเพื่อรายย่อย':
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/bankThai/main/bank-17.png';
+          break;
+        default:
+          bankImage = 'https://raw.githubusercontent.com/EPICCODING17/image/main/Logo-EicCoding.png';
+          break;
+      }
+
+      var row = table.insertRow();
+      row.innerHTML = `
+        <td class="text-center"><span style="font-size: 14px;">${index + 1}</span></td>
+        <td>
+          <div style="display: flex; align-items: center;">
+            <img class="rounded-circle" src="${rowIndex[7] ? rowIndex[7] : '❌ N/A'}" alt="ImageUsers" width="40" style="margin-right: 10px;">
+            <div style="font-size: 14px;">
+              <span>UID: ${rowIndex[0]}</span><br>
+              <span>ชื่อ สกุล: ${rowIndex[3] ? rowIndex[3] : '❌ N/A'}</span><br>
+              <span>ตำแหน่ง: ${rowIndex[4] ? rowIndex[4] : '❌ N/A'}</span><br>
+              <span>แผนก: ${rowIndex[5] ? rowIndex[5] : '❌ N/A'}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span style="font-size: 14px;">การจ้างงาน: ${rowIndex[11] ? rowIndex[11] : '❌ N/A'}</span><br>
+          <span style="font-size: 14px;">การจ่าย: ${rowIndex[21] ? rowIndex[21] : '❌ N/A'}</span><br>
+          <span style="font-size: 14px;">วันที่เริ่มงาน: ${rowIndex[19] ? rowIndex[19] : '❌ N/A'}</span>
+        </td>
+        <td>
+          <div style="display: flex; align-items: center;">
+            <img class="rounded-circle" src="${bankImage}" alt="accountbank" width="40" style="margin-right: 10px;">
+            <div style="font-size: 14px;">
+              <span>ธนาคาร: ${rowIndex[24] ? rowIndex[24] : '❌ N/A'}</span><br>
+              <span>เลขที่บัญชี: ${rowIndex[25] ? rowIndex[25] : '❌ N/A'}</span><br>
+              <span>ประเภท: ${rowIndex[26] ? rowIndex[26] : '❌ N/A'} สาขา: ${rowIndex[27] ? rowIndex[27] : '❌ N/A'}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span style="font-size: 14px;">ที่อยู่: ${rowIndex[29] ? rowIndex[29] : '❌ N/A'}</span><br>
+          <span style="font-size: 14px;">Email: ${rowIndex[30] ? rowIndex[30] : '❌ N/A'}</span><br>
+          <span style="font-size: 14px;">มือถือ: ${rowIndex[32] ? rowIndex[32] : '❌ N/A'}</span>
+        </td>
+        <td class="text-center" style="vertical-align: middle;">
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div class="custom-switch">
+              <input type="checkbox" ${isActive ? 'checked' : ''} id="switch-${rowIndex[0]}" class="custom-switch-input" onchange="toggleUserStatus('${rowIndex[0]}', this.checked)">
+              <label for="switch-${rowIndex[0]}" class="custom-switch-label"></label>
+            </div>
+          </div>
+        </td>
+        <td class="text-center" style="vertical-align: middle;">
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div class="circular-progress" style="--progress-color: ${progressColor}; --progress-angle: ${progressAngle}deg;">
+              <span class="progress-value">${progressbar}%</span>
+            </div>
+          </div>
+        </td>
+        <td class="text-center" style="vertical-align: middle;">
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <button type='button' class='btn btn-sm me-2 ${buttonClass}' onclick='editEmployee("${rowIndex[0]}");'><i class='fa-solid fa-check'></i> ตรวจสอบ</button>
+          </div>
+        </td>
+      `;
+    }
+  });
+}
+
+const filterEmployee = () => {
+  const query = document.getElementById('searchEmployee').value.toLowerCase();
+  filteredEmployee = dataUsers.filter(row => {
+    return row.some(column => (column || '').toString().toLowerCase().includes(query));
+  });
+
+  renderEmployee(filteredEmployee);
+}
+
+document.addEventListener('DOMContentLoaded', (ev) => {
+  let input = document.querySelector('input[id="employeeImg"]');
+  input.addEventListener('change', (ev) => {
+      if (input.files[0].type.indexOf("image/") > -1) {
+        let img = document.getElementById('employeePreview');
+        img.src = window.URL.createObjectURL(input.files[0]);
+      }
+  });
+});
+
+const reverseFormatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('/');
+  return `${parts[2]}-${parts[1]}-${parts[0]}`;
+};
+
+const editEmployee = (codeID) => {
+  const rowIndex = dataUsers.find(row => row[0] === codeID);
+  if (rowIndex) {
+    $('#EmployeeModal').modal('show');
+    $('#employeePreview').attr('src', rowIndex[7]); //Img
+    $('#empDataKey').val(rowIndex[0]); //UID
+    $('#empData1').val(rowIndex[3]); //ชื่อสกุล
+    $('#empData2').val(rowIndex[4]); //ตำแหน่ง
+    $('#empData3').val(rowIndex[5]); //แผนก
+    $('#empData4').val(rowIndex[14]); //เพศ
+    $('#empData5').val(rowIndex[15] ? reverseFormatDate(rowIndex[15]) : ''); //วันเกิด
+    $('#empData6').val(rowIndex[16]); //สัญชาติ
+    $('#empData7').val(rowIndex[17]); //สถานภาพ
+    $('#empData8').val(rowIndex[18]); //พิการ/ทุพพลภาพ
+
+    $('#empData9').val(rowIndex[12]); //เลขประจำตัวประชาชน
+    $('#empData10').val(rowIndex[13]); //เลขประกันสังคม
+    //สิทธิ์ประกันสังคม
+    document.querySelectorAll('input[name="empData11"]').forEach(input => {
+      input.checked = false;
+      input.closest('.Employee-card').classList.remove('selected');
+      if (input.value === rowIndex[28]) {
+        input.checked = true;
+        input.closest('.Employee-card').classList.add('selected');
+      }
+    });
+
+    $('#empData12').val(rowIndex[29]); //ที่อยู่
+    $('#empData13').val(rowIndex[30]); //Email
+    $('#empData14').val(rowIndex[31]); //Line
+    $('#empData15').val(rowIndex[32]); //Phone
+
+    $('#empData16').val(rowIndex[11]); //การจ้างงาน
+    $('#empData17').val(rowIndex[19] ? reverseFormatDate(rowIndex[19]) : ''); //วันที่เริ่มงาน
+    $('#empData18').val(rowIndex[21]); //การจ่าย
+    $('#empData19').val(rowIndex[20] ? rowIndex[20].replace(/,/g, '') : ''); //ค่าจ้าง
+    $('#empData20').val(rowIndex[22] ? rowIndex[22].replace(/,/g, '') : ''); //เงินพิเศษ
+
+    $('#empData21').val(rowIndex[23]); //วิธีจ่าย
+    $('#empData22').val(rowIndex[24]); //ธนาคาร
+    $('#empData23').val(rowIndex[25]); //เลขที่บัญชี
+    //ประเภทบัญชี
+    document.querySelectorAll('input[name="empData24"]').forEach(input => {
+      input.checked = false;
+      input.closest('.Employee-card').classList.remove('selected');
+      if (input.value === rowIndex[26]) {
+        input.checked = true;
+        input.closest('.Employee-card').classList.add('selected');
+      }
+    });
+    $('#empData25').val(rowIndex[27]); //สาขา
+  }
+}
+
+const submitDataEmployee = () => {
+  event.preventDefault();
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+  const obj = {
+    empCode: document.getElementById("empDataKey").value,
+    empData1: document.getElementById("empData1").value,
+    empData2: document.getElementById("empData2").value,
+    empData3: document.getElementById("empData3").value,
+    empData4: document.getElementById("empData4").value,
+    empData5: document.getElementById("empData5").value,
+    empData6: document.getElementById("empData6").value,
+    empData7: document.getElementById("empData7").value,
+    empData8: document.getElementById("empData8").value,
+    empData9: document.getElementById("empData9").value,
+    empData10: document.getElementById("empData10").value,
+    empData11: document.querySelector('input[name="empData11"]:checked').value,
+    empData12: document.getElementById("empData12").value,
+    empData13: document.getElementById("empData13").value,
+    empData14: document.getElementById("empData14").value,
+    empData15: document.getElementById("empData15").value,
+    empData16: document.getElementById("empData16").value,
+    empData17: document.getElementById("empData17").value,
+    empData18: document.getElementById("empData18").value,
+    empData19: document.getElementById("empData19").value,
+    empData20: document.getElementById("empData20").value,
+    empData21: document.getElementById("empData21").value,
+    empData22: document.getElementById("empData22").value,
+    empData23: document.getElementById("empData23").value,
+    empData24: document.querySelector('input[name="empData24"]:checked').value,
+    empData25: document.getElementById("empData25").value
+  };
+
+  if ($("#employeeImg").val() === "") {
+    obj.profile = $("#employeePreview").attr("src");
+  } else {
+    const imgElement = document.getElementById("employeePreview");
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = imgElement.naturalWidth;
+    canvas.height = imgElement.naturalHeight;
+    context.drawImage(imgElement, 0, 0, imgElement.naturalWidth, imgElement.naturalHeight);
+    obj.imageDataUrl = canvas.toDataURL("image/png");
+    obj.filetype = "image/png";
+    obj.filename = obj.empData1;
+  }
+
+  if (!obj.empCode || !obj.empData1 || !obj.empData2 || !obj.empData3 || !obj.empData4 || !obj.empData5 || !obj.empData6 || !obj.empData7 || !obj.empData8 || !obj.empData9 || !obj.empData10) {
+    createToast("⚠️ กรุณากรอกข้อมูลให้ครบถ้วน", 3);
+    $.LoadingOverlay("hide");
+    return;
+  }
+
+  google.script.run.withSuccessHandler(async (res) => {
+    $.LoadingOverlay("hide");
+    $('#EmployeeModal').modal('hide');
+    await updateSpecificDataUsers();
+    createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+  }).saveDataEmployee(obj);
+};
+
+const selectEmpCard = (selectedId, groupName) => {
+  document.querySelectorAll(`.Employee-card input[name='${groupName}']`).forEach(input => {
+    input.closest('.Employee-card').classList.remove('selected');
+    input.checked = false;
+  });
+  const selectedCard = document.getElementById(selectedId);
+  selectedCard.classList.add('selected');
+  selectedCard.querySelector('input').checked = true;
+};
+
+const clearDataEmployee = () => {
+  $('#EmployeeModal').modal('hide');
+  document.getElementById("employeeImg").value = "";
+  document.getElementById("employeePreview").src = "https://img2.pic.in.th/pic/vsvds.png";
+
+  document.getElementById("empDataKey").value = "";
+  document.getElementById("empData1").value = "";
+  document.getElementById("empData2").value = "";
+  document.getElementById("empData3").value = "";
+  document.getElementById("empData4").value = "";
+  document.getElementById("empData5").value = "";
+  document.getElementById("empData6").value = "";
+  document.getElementById("empData7").value = "";
+  document.getElementById("empData8").value = "";
+  document.getElementById("empData9").value = "";
+  document.getElementById("empData10").value = "";
+  document.getElementById("empData12").value = "";
+  document.getElementById("empData13").value = "";
+  document.getElementById("empData14").value = "";
+  document.getElementById("empData15").value = "";
+  document.getElementById("empData16").value = "";
+  document.getElementById("empData17").value = "";
+  document.getElementById("empData18").value = "";
+  document.getElementById("empData19").value = "";
+  document.getElementById("empData20").value = "";
+  document.getElementById("empData21").value = "";
+  document.getElementById("empData22").value = "";
+  document.getElementById("empData23").value = "";
+  document.getElementById("empData25").value = "";
+
+  document.querySelectorAll('.Employee-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+
+  document.getElementById("radioCheckDataA").checked = true;
+  document.getElementById("radioCheckDataC").checked = true;
+
+  document.getElementById("cardCheckDataA").classList.add('selected');
+  document.getElementById("cardCheckDataC").classList.add('selected');
+};
+</script>
