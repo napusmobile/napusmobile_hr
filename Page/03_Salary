@@ -1,0 +1,829 @@
+<div class="row g-3 mt-2">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body rounded-4">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="d-flex flex-column">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 style="color: var(--box1);font-weight: bold;">💸 รายการจ่ายเงิน/ค่าจ้าง</h5>
+                </div>
+
+                <div class="d-flex align-items-center mb-2">
+                  <label for="dataSalary" class="col-form-label me-2" style="width: 100px;">📅 วันที่จ่าย:</label>
+                  <input type="date" class="form-control w-auto" id="dataSalary">
+                </div>
+                <div class="d-flex align-items-center mb-2" hidden>
+                  <input type="input" class="form-control w-auto" id="dataSalaryKey" hidden>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <div class="form-switch-wrapper me-2">
+                    <input class="styled-switch" type="checkbox" id="deductLate" checked onchange="updateAllTotals()">
+                    <label class="form-check-label" for="deductLate">สาย</label>
+                  </div>
+                  <div class="form-switch-wrapper me-2">
+                    <input class="styled-switch" type="checkbox" id="deductLeave" checked onchange="updateAllTotals()">
+                    <label class="form-check-label" for="deductLeave">ลา</label>
+                  </div>
+                  <div class="form-switch-wrapper me-2">
+                    <input class="styled-switch" type="checkbox" id="includeOT" checked onchange="updateAllTotals()">
+                    <label class="form-check-label" for="includeOT">โอที</label>
+                  </div>
+                  <div class="form-switch-wrapper me-2">
+                    <input class="styled-switch" type="checkbox" id="includeSSO" checked onchange="updateAllTotals()">
+                    <label class="form-check-label" for="includeSSO">ประกัน</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="d-flex flex-column align-items-end">
+                <div class="d-flex justify-content-end align-items-center">
+                  <div class="text-end flex-fill">
+                    <span class="d-block">รวมค่าใช้จ่ายพนักงาน <span style="color: var(--box1);"><i class="fa-solid fa-sack-dollar"></i></span></span>
+                    <span style="font-size: 1.5rem;font-weight: bold;color: var(--box1);" id="salaryBefore">0.00</span>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="text-end flex-fill">
+                    <span class="d-block">รวมจ่ายสุทธิ <span style="color: var(--box2);"><i class="fa-solid fa-file-invoice-dollar"></i></span></span>
+                    <span style="font-size: 1.5rem;font-weight: bold;color: var(--box2);" id="salaryAfter">0.00</span>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end align-items-center mt-3">
+                  <div class="text-end flex-fill">
+                    <span class="d-block">รวมปรับเพิ่ม <span style="color: var(--box2);"><i class="fa-solid fa-circle-arrow-up"></i></span></span>
+                    <span style="font-size: 1.5rem;font-weight: bold;color: var(--box2);" id="totalAdj">0.00</span>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="text-end flex-fill">
+                    <span class="d-block">รวมปรับลด <span style="color: var(--box4);"><i class="fa-solid fa-circle-arrow-down"></i></span></span>
+                    <span style="font-size: 1.5rem;font-weight: bold;color: var(--box4);" id="totalDow">0.00</span>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row g-3 mt-1">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">👨‍💼 จัดการเงินเดือนพนักงาน</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+            <select id="selectPeriod" class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;"></select>
+            <button type="button" class="btn set-button me-2 mb-2 mb-md-0" onclick="renderSalaryData()">ดึงข้อมูล</button>
+            <button type="button" class="btn upload-button me-2 mb-2 mb-md-0" onclick="actionSummary()">นำส่งข้อมูล</button>
+            <button type="button" class="btn del-button me-2 mb-2 mb-md-0" onclick="clearSummaryData()">ยกเลิก</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="card-header bg-white">
+        <div class="row">
+          <div class="d-flex justify-content-center align-items-center mb-2">
+            <button type="button" class="btn upload-button me-2" onclick="selectAllEmployees(true)">
+              <i class="fa-solid fa-check"></i> เลือกทั้งหมด
+            </button>
+            <button type="button" class="btn del-button" onclick="selectAllEmployees(false)">
+              <i class="fa-solid fa-xmark"></i> ยกเลิกทั้งหมด
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">งวดที่</th>
+                <th scope="col" class="text-center">ชื่อ สกุล</th>
+                <th scope="col" class="text-center">เงินเดือน</th>
+                <th scope="col" class="text-center">เงินพิเศษ</th>
+                <th scope="col" class="text-center">สายรวม</th>
+                <th scope="col" class="text-center">ลาป่วย</th>
+                <th scope="col" class="text-center">ลากิจ</th>
+                <th scope="col" class="text-center">ลาพักร้อน</th>
+                <th scope="col" class="text-center">ลาอื่นๆ</th>
+                <th scope="col" class="text-center">หักสาย</th>
+                <th scope="col" class="text-center">หักลา</th>
+                <th scope="col" class="text-center">OT</th>
+                <th scope="col" class="text-center">รายได้OT</th>
+                <th scope="col" class="text-center">รายได้อื่นๆ</th>
+                <th scope="col" class="text-center">หักอื่นๆ</th>
+                <th scope="col" class="text-center">ประกันสังคม</th>
+                <th scope="col" class="text-center">รายได้รวม</th>
+              </tr>
+            </thead>
+            <tbody id="tableDataSalary">
+              <tr>
+                <td colspan='17' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>
+              </tr>
+            </tbody>       
+          </table>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0 align-items-center" id="paginationSalaryInfo"></div>
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div id="paginationSalary" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const renderSalaryData = (editMode = false, codeID = null) => {  
+  let salaryBeforeTotal = 0;
+  let totalAdj = 0;
+  let totalDow = 0;
+
+  const tableData = document.getElementById('tableDataSalary');
+  tableData.innerHTML = '';  // เคลียร์ข้อมูลตารางก่อนดึงใหม่
+
+  // กำหนดวันหยุดพิเศษจาก allSetDayOff
+  const allSetDayOffDates = allSetDayOff && allSetDayOff.length > 0 
+    ? allSetDayOff.map(dayOff => new Date(dayOff[1].split('/').reverse().join('-'))) 
+    : [];
+
+  // ตรวจสอบช่วงวันที่งวดที่เลือกและกำหนดวันหยุดสุดสัปดาห์จาก allSetWeekEnd
+  const selectedPeriodValue = getSelectedPeriod();
+  const selectedPeriod = allsetSalary.find(period => period[0] === selectedPeriodValue);
+  if (!selectedPeriod) {
+    createToast("⚠️ ไม่พบงวดที่เลือก", 3);
+    return;
+  }
+
+  const [_, startDateStr, endDateStr, period] = selectedPeriod;
+  const startDate = new Date(startDateStr.split('/').reverse().join('-'));
+  const endDate = new Date(endDateStr.split('/').reverse().join('-'));
+
+  const allSetWeekEndDates = [];
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    const dayOfWeek = d.getDay();
+    const isWeekendDayOff = allSetWeekEnd.some(dayOff => {
+      const [id, dayName, status] = dayOff;
+      return status === 'TRUE' && dayName === ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'][dayOfWeek];
+    });
+    if (isWeekendDayOff) allSetWeekEndDates.push(new Date(d));
+  }
+
+  // รวมวันหยุดทั้งหมดไว้ในอาเรย์ allSetHolidayDates
+  const allSetHolidayDates = [...allSetDayOffDates, ...allSetWeekEndDates];
+
+  if (!editMode) {
+    const sortedDataUsers = dataUsers.slice().sort((a, b) => {
+      const numA = parseInt(a[0].replace('USER-', ''));
+      const numB = parseInt(b[0].replace('USER-', ''));
+      return numA - numB;
+    });
+
+    let hasData = false;
+    sortedDataUsers.forEach(user => {
+      if (user[10] === 'TRUE') {  // เฉพาะผู้ใช้ที่ active
+        const uidUser = user[0];
+
+        const attendanceRecords = alltimeAttendance.filter(record => {
+          const recordDate = new Date(record[0].split('/').reverse().join('-')); 
+          return record[1] === uidUser && recordDate >= startDate && recordDate <= endDate;
+        });
+
+        const leaveRecords = allleave.filter(leave => {
+          const leaveStartDate = new Date(leave[11].split('T')[0]);
+          const leaveEndDate = new Date(leave[12].split('T')[0]);
+          return leave[3] === uidUser && leave[1] === 'อนุมัติ' && leaveEndDate >= startDate && leaveStartDate <= endDate;
+        });
+
+        if (attendanceRecords.length === 0 && leaveRecords.length === 0) return;
+
+        hasData = true;
+
+        const [_, , , fullName, department, group, , userImage, , , , , , , , , , , , , salaryStr, , specialAllowanceStr] = user;
+        const salary = parseFloat(salaryStr.replace(/,/g, '')) || 0;
+        const specialAllowance = parseFloat(specialAllowanceStr.replace(/,/g, '')) || 0;
+        let lateMinutes = 0, otMinutes = 0;
+
+        attendanceRecords.forEach(record => {
+          const [_, uid, , checkIn, checkOut] = record;
+          const recordDate = new Date(record[0].split('/').reverse().join('-'));
+          const timeRule = allsetTime.find(time => time[3] === 'TRUE');
+
+          const isHoliday = allSetHolidayDates.some(dayOffDate => dayOffDate.getTime() === recordDate.getTime());
+
+          if (isHoliday) {
+            otMinutes += convertToMinutes(checkOut) - convertToMinutes(checkIn);
+          } else {
+            if (checkOut && timeRule && checkOut > timeRule[2]) {
+              otMinutes += calculateOTMinutes(checkOut, timeRule[2]);
+            }
+            if (checkIn && timeRule && convertToMinutes(checkIn) > convertToMinutes(timeRule[1])) {
+              lateMinutes += calculateLateMinutes(checkIn, timeRule[1]);
+            }
+          }
+        });
+
+        const lateHoursDecimal = (lateMinutes / 60).toFixed(2);
+        const otHoursDecimal = (otMinutes / 60).toFixed(2);
+        const otPay = calculateOTPay(otMinutes / 60);
+
+        const calculateLeave = (type) => {
+          const leaves = leaveRecords.filter(leave => type.includes(leave[8]));
+          let totalDays = leaves.reduce((total, leave) => total + parseFloat(leave[13]), 0);
+          let totalHours = leaves.reduce((total, leave) => total + parseFloat(leave[14]), 0);
+          
+          totalDays += Math.floor(totalHours / 24);
+          totalHours %= 24;
+          
+          return (totalDays + (totalHours / 24)).toFixed(2);
+        };
+
+        const sickLeave = calculateLeave(['ลาป่วยมีใบรับรองแพทย์', 'ลาป่วยไม่มีใบรับรองแพทย์']);
+        const personalLeave = calculateLeave(['ลากิจจำเป็น', 'ลากิจทั่วไป']);
+        const vacationLeave = calculateLeave(['ลาพักร้อน']);
+        const otherLeave = calculateLeave(['ลาบวช', 'ลาคลอด', 'ลารับราชการทหาร']);
+
+        const socialSecurity = calculateSocialSecurity(salary);
+        const daysInPeriod = calculateDaysInPeriod(startDateStr, endDateStr);
+        const leaveDeductions = calculateLeaveDeductions(leaveRecords, salary, daysInPeriod);
+        const lateDeductions = calculateLateDeductions(lateMinutes, salary, daysInPeriod, 8);
+
+        let totalIncome = (
+          salary + specialAllowance + otPay - socialSecurity - leaveDeductions - lateDeductions
+        ).toFixed(2);
+
+        salaryBeforeTotal += parseFloat(totalIncome);
+
+        // แสดงข้อมูลในตาราง
+        tableData.innerHTML += `
+          <tr>
+          <td class="text-center">
+            <div class="form-check">
+              <input class="form-check-input select-employeesalary" type="checkbox" checked id="select-${uidUser}" data-uid="${uidUser}">
+              <span style="font-size: 14px;">${period}</span>
+            </div>
+          </td>
+            <td>
+              <div style="display: flex; align-items: center;">
+                <img src="${userImage}" alt="ImageUsers" width="40px" style="margin-right: 10px;" style="border-radius: 50%;">
+                <div style="font-size: 14px;">
+                  <span>รหัสพนักงาน: ${uidUser}</span><br>
+                  <span>ชื่อ สกุล: ${fullName}</span><br>
+                  <span>ตำแหน่ง: ${department}</span><br>
+                  <span>แผนก: ${group}</span>
+                </div>
+              </div>
+            </td>
+            <td class="text-center"><span style="color: var(--box2);font-size: 14px;">${salary.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-center"><span style="color: var(--box1);font-size: 14px;">${specialAllowance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${lateHoursDecimal}</span></td>
+            <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${sickLeave}</span></td>
+            <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${personalLeave}</span></td>
+            <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${vacationLeave}</span></td>
+            <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${otherLeave}</span></td>
+            <td class="text-end"><span style="color: var(--box4);font-size: 14px;">${lateDeductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-end"><span style="color: var(--box4);font-size: 14px;">${leaveDeductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-center"><span style="color: var(--box3);font-size: 14px;">${otHoursDecimal}</span></td>
+            <td class="text-end"><span style="color: var(--box1);font-size: 14px;" id="otPay-${uidUser}">${otPay.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-end" style="width: 120px; position: relative;">
+              <div style="position: relative; display: inline-block; width: 100%;">
+                <input type="number" id="otherIncome-${uidUser}" class="form-control form-control-sm" step="0.01" value="0.00" onchange="updateTotal('${uidUser}')" style="padding-right: 30px;">
+                <span style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); color: var(--box2);">
+                  <i class="fa-solid fa-circle-arrow-up"></i>
+                </span>
+              </div>
+            </td>
+            <td class="text-end" style="width: 120px; position: relative;">
+              <div style="position: relative; display: inline-block; width: 100%;">
+                <input type="number" id="otherDeductions-${uidUser}" class="form-control form-control-sm" step="0.01" value="0.00" onchange="updateTotal('${uidUser}')" style="padding-right: 30px;">
+                <span style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); color: var(--box4);">
+                  <i class="fa-solid fa-circle-arrow-down"></i>
+                </span>
+              </div>
+            </td>
+            <td class="text-end"><span style="color: var(--box3);font-size: 14px;" id="socialSecurity-${uidUser}">${socialSecurity.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-end">
+              <span id="totalIncome-${uidUser}" data-base-income="${totalIncome}" style="color: var(--box2);font-size: 14px;">${totalIncome.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    if (!hasData) {
+      tableData.innerHTML = `
+        <tr>
+          <td colspan="17" class="fw-bold text-danger text-center p-4">
+            <i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓
+          </td>
+        </tr>
+      `;
+    }
+  document.getElementById('salaryBefore').textContent = salaryBeforeTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('salaryAfter').textContent = salaryBeforeTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalAdj').textContent = totalAdj.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalDow').textContent = totalDow.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  } else {
+    // กรณีแก้ไขรายการ: ดึงข้อมูลจาก allSummary โดยใช้ codeID
+    const summaryData = allSummary.find(summary => summary[0] === codeID);
+    if (!summaryData) {
+      createToast("⚠️ ไม่พบข้อมูลที่ต้องการแก้ไข", 3);
+      return;
+    }
+
+    const details = JSON.parse(summaryData[5]);  // ดึงข้อมูลรายละเอียดพนักงาน
+    const period = summaryData[1];  // งวดที่
+    hasData = true;
+
+    // แสดงข้อมูลพนักงานในตาราง
+    details.forEach((detail, index) => {
+      const { uidUser, fullName, department, group, salary, specialAllowance, otHours, otIncome, sickLeave, personalLeave, vacationLeave, otherLeave, lateDeductions, leaveDeductions, otherIncome, otherDeductions, socialSecurity, totalIncome, lateHours } = detail;
+      
+      // คำนวณค่าใช้จ่ายรวมและการปรับเพิ่ม/ลด
+      salaryBeforeTotal += parseFloat(totalIncome);
+      totalAdj += parseFloat(otherIncome);
+      totalDow += parseFloat(otherDeductions);
+      let cleanUidUser = uidUser.replace('รหัสพนักงาน: ', '');
+      let user = dataUsers && dataUsers.find(user => user[0] === cleanUidUser);
+      let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+
+      tableData.innerHTML += `
+        <tr>
+          <td class="text-center">
+            <div class="form-check">
+              <input class="form-check-input select-employeesalary" type="checkbox" checked id="select-${uidUser}" data-uid="${uidUser}">
+              <span style="font-size: 14px;">${period}</span>
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center;">
+              <img src="${userImage}" alt="ImageUsers" width="40px" style="margin-right: 10px; border-radius: 50%;">
+              <div style="font-size: 14px;">
+                <span>${uidUser}</span><br>
+                <span>${fullName}</span><br>
+                <span>${department}</span><br>
+                <span>${group}</span>
+              </div>
+            </div>
+          </td>
+          <td class="text-center"><span style="color: var(--box2);font-size: 14px;">${salary.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+          <td class="text-center"><span style="color: var(--box1);font-size: 14px;">${specialAllowance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+          <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${lateHours.toFixed(2)}</span></td>
+          <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${sickLeave.toFixed(2)}</span></td>
+          <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${personalLeave.toFixed(2)}</span></td>
+          <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${vacationLeave.toFixed(2)}</span></td>
+          <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${otherLeave.toFixed(2)}</span></td>
+          <td class="text-end"><span style="color: var(--box4);font-size: 14px;">${lateDeductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+          <td class="text-end"><span style="color: var(--box4);font-size: 14px;">${leaveDeductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+          <td class="text-center"><span style="color: var(--box4);font-size: 14px;">${otHours.toFixed(2)}</span></td>
+          <td class="text-center"><span style="color: var(--box1);font-size: 14px;">${otIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+          <td class="text-end" style="width: 120px; position: relative;">
+            <div style="position: relative; display: inline-block; width: 100%;">
+              <input type="number" id="otherIncome-${uidUser}" class="form-control form-control-sm" step="0.01" value="${otherIncome.toFixed(2)}" onchange="updateTotal('${uidUser}')" style="padding-right: 30px;">
+              <span style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); color: var(--box2);">
+                <i class="fa-solid fa-circle-arrow-up"></i>
+              </span>
+            </div>
+          </td>
+          <td class="text-end" style="width: 120px; position: relative;">
+            <div style="position: relative; display: inline-block; width: 100%;">
+              <input type="number" id="otherDeductions-${uidUser}" class="form-control form-control-sm" step="0.01" value="${otherDeductions.toFixed(2)}" onchange="updateTotal('${uidUser}')" style="padding-right: 30px;">
+              <span style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); color: var(--box4);">
+                <i class="fa-solid fa-circle-arrow-down"></i>
+              </span>
+            </div>
+          </td>
+          <td class="text-end"><span style="color: var(--box3);font-size: 14px;">${socialSecurity.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span></td>
+            <td class="text-end">
+              <span id="totalIncome-${uidUser}" data-base-income="${totalIncome}" style="color: var(--box2);font-size: 14px;">${totalIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>
+            </td>
+        </tr>
+      `;
+    });
+  }
+};
+
+// ฟังก์ชันดึงงวดที่เลือก
+const getSelectedPeriod = () => {
+  const selectPeriod = document.getElementById('selectPeriod');
+  return selectPeriod.value;
+};
+
+// ฟังก์ชันคำนวณเวลาสายเป็นนาที
+const calculateLateMinutes = (checkInTime, standardInTime) => {
+  if (!checkInTime || !standardInTime) return 0;
+  const checkInMinutes = convertToMinutes(checkInTime);
+  const standardInMinutes = convertToMinutes(standardInTime);
+  const lateMinutes = checkInMinutes - standardInMinutes;
+
+  // เริ่มคำนวณเฉพาะเมื่อมาสายเกิน 30 นาที
+  return lateMinutes > 0 ? lateMinutes - 0 : 0;
+};
+
+// ฟังก์ชันแปลงเวลาเป็นนาที
+const convertToMinutes = (timeString) => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+// ฟังก์ชันคำนวณ OT เป็นนาที ปรับให้ใช้ convertToMinutes
+const calculateOTMinutes = (checkOutTime, standardOutTime) => {
+  const checkOutMinutes = convertToMinutes(checkOutTime);
+  const standardOutMinutes = convertToMinutes(standardOutTime);
+  const otMinutes = checkOutMinutes - standardOutMinutes;
+  return otMinutes > 0 ? otMinutes : 0;
+};
+
+// ฟังก์ชันคำนวณการหักเงินจากการมาสาย
+const calculateLateDeductions = (lateMinutes, salary, daysInPeriod, workHoursPerDay) => {
+  const { minuteWage } = calculateHourlyAndMinuteWage(salary, daysInPeriod, workHoursPerDay);
+  return lateMinutes * minuteWage;
+};
+
+// ฟังก์ชันคำนวณค่าแรงต่อวัน ต่อชั่วโมง และต่อนาที
+const calculateHourlyAndMinuteWage = (salary, daysInPeriod, workHoursPerDay) => {
+  const dailyWage = salary / daysInPeriod;
+  const hourlyWage = dailyWage / workHoursPerDay;
+  const minuteWage = hourlyWage / 60;
+  return { dailyWage, hourlyWage, minuteWage };
+};
+
+// คำนวณประกันสังคมโดยใช้ค่า SSO ที่เปิดใช้งาน
+const calculateSocialSecurity = (salary) => {
+  const activeSSO = allSetSSO.find(sso => sso[2] === 'TRUE'); // ดึงค่า SSO ที่เปิดใช้งาน
+  const ssoRate = activeSSO ? parseFloat(activeSSO[1].replace('%', '')) / 100 : 0.05; // ถ้าไม่มี SSO ที่เปิดใช้งาน ใช้ค่าเริ่มต้น 5%
+  const ssoAmount = salary * ssoRate;
+  return salary > 15000 ? Math.min(ssoAmount, 750) : ssoAmount;
+};
+
+// ฟังก์ชันคำนวณจำนวนวันในงวดเงินเดือน
+const calculateDaysInPeriod = (startDateStr, endDateStr) => {
+  const startDate = new Date(startDateStr.split('/').reverse().join('-'));
+  const endDate = new Date(endDateStr.split('/').reverse().join('-'));
+  const differenceInTime = endDate - startDate;
+  return Math.ceil(differenceInTime / (1000 * 60 * 60 * 24)); // จำนวนวันในงวด
+};
+
+// คำนวณการหักจากวันลา
+const calculateLeaveDeductions = (leaveRecords, salary, daysInPeriod) => {
+  const dailyWage = salary / daysInPeriod;
+  let totalLeaveDays = 0;
+  let totalLeaveHours = 0;
+
+  leaveRecords.forEach(leave => {
+    totalLeaveDays += parseFloat(leave[13]);
+    totalLeaveHours += parseFloat(leave[14]);
+  });
+
+  const additionalLeaveDaysFromHours = Math.floor(totalLeaveHours / 24);
+  const remainingLeaveHours = totalLeaveHours % 24;
+  totalLeaveDays += additionalLeaveDaysFromHours;
+
+  const leaveDeductions = dailyWage * totalLeaveDays + (remainingLeaveHours / 24) * dailyWage;
+  return leaveDeductions;
+};
+
+const calculateOTPay = (otHours, recordDate, allSetHolidayDates) => {
+  const isHoliday = allSetHolidayDates && allSetHolidayDates.length > 0 
+    ? allSetHolidayDates.some(dayOffDate => dayOffDate.getTime() === recordDate.getTime())
+    : false;  // ถ้าไม่มีข้อมูลวันหยุดถือว่าไม่ใช่วันหยุด
+
+  const activeOTValue = getActiveOTValue();
+  const otRate = isHoliday ? 2.0 : activeOTValue; // ถ้าเป็นวันหยุด OT เพิ่มเป็น 2 เท่า
+
+  return otHours * 200 * otRate; // คำนวณรายได้จาก OT
+};
+
+// ฟังก์ชันดึงค่า OT ที่เปิดใช้งาน
+const getActiveOTValue = () => {
+  const activeOT = allSetOT.find(ot => ot[2] === 'TRUE'); // ดึงค่า OT ที่เปิดใช้งาน (status === 'TRUE')
+  return activeOT ? parseFloat(activeOT[1]) : 1.0; // ถ้าไม่มี OT ที่เปิดใช้งาน ให้คืนค่าเป็น 1.0
+};
+
+// ฟังก์ชันคำนวณรายได้รวมใหม่
+const updateTotal = (uid) => {
+  // ดึงข้อมูลจากฟิลด์ที่มีการกรอก
+  const otherIncomeInput = document.getElementById(`otherIncome-${uid}`);
+  const otherDeductionsInput = document.getElementById(`otherDeductions-${uid}`);
+  const totalIncomeElement = document.getElementById(`totalIncome-${uid}`);
+  
+  if (!otherIncomeInput || !otherDeductionsInput || !totalIncomeElement) {
+    return;
+  }
+
+  const otherIncome = parseFloat(otherIncomeInput.value) || 0;
+  const otherDeductions = parseFloat(otherDeductionsInput.value) || 0;
+  
+  otherIncomeInput.value = otherIncomeInput.value.trim() === '' ? '0.00' : otherIncome.toFixed(2);
+  otherDeductionsInput.value = otherDeductionsInput.value.trim() === '' ? '0.00' : otherDeductions.toFixed(2);
+
+  const baseIncome = parseFloat(totalIncomeElement.getAttribute('data-base-income')) || 0;
+  const newTotalIncome = (baseIncome + otherIncome - otherDeductions).toFixed(2);
+
+  totalIncomeElement.textContent = newTotalIncome.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  // ปรับค่า salaryAfter ใหม่
+  let salaryAfterTotal = 0;
+  let totalAdj = 0;
+  let totalDow = 0;
+
+  const totalIncomeElements = document.querySelectorAll('[id^="totalIncome-"]');
+  totalIncomeElements.forEach(element => {
+    salaryAfterTotal += parseFloat(element.textContent.replace(/,/g, '')) || 0;
+  });
+
+  const otherIncomeElements = document.querySelectorAll('[id^="otherIncome-"]');
+  otherIncomeElements.forEach(element => {
+    if (element) {
+      totalAdj += parseFloat(element.value.replace(/,/g, '')) || 0;
+    }
+  });
+
+  const otherDeductionsElements = document.querySelectorAll('[id^="otherDeductions-"]');
+  otherDeductionsElements.forEach(element => {
+    if (element) {
+      totalDow += parseFloat(element.value.replace(/,/g, '')) || 0;
+    }
+  });
+
+  document.getElementById('salaryAfter').textContent = salaryAfterTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalAdj').textContent = totalAdj.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalDow').textContent = totalDow.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const updateAllTotals = () => {
+  const tableBody = document.getElementById('tableDataSalary');
+  if (!tableBody) return;
+
+  const rows = tableBody.querySelectorAll('tr');
+  
+  const hasNoData = rows.length === 0 || 
+    (rows.length === 1 && rows[0].querySelector('td[colspan]')?.textContent.includes('ไม่พบข้อมูล'));
+
+  if (hasNoData) {
+    createToast("⚠️ ไม่พบข้อมูลในตาราง", 3);
+    return;
+  }
+
+  const deductLate = document.getElementById('deductLate').checked;
+  const deductLeave = document.getElementById('deductLeave').checked;
+  const includeOT = document.getElementById('includeOT').checked;
+  const includeSSO = document.getElementById('includeSSO').checked;
+  
+  let salaryAfterTotal = 0;
+  let totalAdj = 0;
+  let totalDow = 0;
+
+  // คำนวณยอดรวมจากทุกแถว ไม่ว่าจะถูกเลือกหรือไม่
+  rows.forEach(row => {
+    const salaryCell = row.querySelector('td:nth-child(3) span');
+    if (!salaryCell) return;
+
+    const totalIncomeCell = row.querySelector('[id^="totalIncome-"]');
+    const baseIncome = parseFloat(totalIncomeCell.getAttribute('data-base-income').replace(/,/g, '')) || 0;
+    salaryAfterTotal += baseIncome;
+  });
+
+  // อัพเดทการแสดงผลและคำนวณส่วนที่ปรับเพิ่ม/ลด
+  rows.forEach(row => {
+    const checkbox = row.querySelector('.select-employeesalary');
+    const salaryCell = row.querySelector('td:nth-child(3) span');
+    if (!salaryCell) return;
+
+    // ดึงค่าที่ต้องการปรับ
+    const lateDeductionsCell = row.querySelector('td:nth-child(10) span');
+    const leaveDeductionsCell = row.querySelector('td:nth-child(11) span');
+    const otPayCell = row.querySelector('td:nth-child(13) span');
+    const ssoCell = row.querySelector('td:nth-child(16) span');
+    const totalIncomeCell = row.querySelector('[id^="totalIncome-"]');
+    const otherIncomeInput = row.querySelector('[id^="otherIncome-"]');
+    const otherDeductionsInput = row.querySelector('[id^="otherDeductions-"]');
+
+    // เก็บค่าดั้งเดิมถ้ายังไม่เคยเก็บ
+    if (!lateDeductionsCell.hasAttribute('data-original')) {
+      lateDeductionsCell.setAttribute('data-original', lateDeductionsCell.textContent);
+    }
+    if (!leaveDeductionsCell.hasAttribute('data-original')) {
+      leaveDeductionsCell.setAttribute('data-original', leaveDeductionsCell.textContent);
+    }
+    if (!otPayCell.hasAttribute('data-original')) {
+      otPayCell.setAttribute('data-original', otPayCell.textContent);
+    }
+    if (!ssoCell.hasAttribute('data-original')) {
+      ssoCell.setAttribute('data-original', ssoCell.textContent);
+    }
+
+    const originalLateDeductions = parseFloat(lateDeductionsCell.getAttribute('data-original').replace(/,/g, '')) || 0;
+    const originalLeaveDeductions = parseFloat(leaveDeductionsCell.getAttribute('data-original').replace(/,/g, '')) || 0;
+    const originalOtPay = parseFloat(otPayCell.getAttribute('data-original').replace(/,/g, '')) || 0;
+    const originalSSO = parseFloat(ssoCell.getAttribute('data-original').replace(/,/g, '')) || 0;
+    const otherIncome = parseFloat(otherIncomeInput?.value || 0);
+    const otherDeductions = parseFloat(otherDeductionsInput?.value || 0);
+
+    // อัพเดทการแสดงผลและคำนวณการปรับเพิ่ม/ลด
+    if (checkbox?.checked) {
+      let adjustment = 0;
+      
+      if (!deductLate) adjustment += originalLateDeductions;
+      if (!deductLeave) adjustment += originalLeaveDeductions;
+      if (!includeOT) adjustment -= originalOtPay;
+      if (!includeSSO) adjustment += originalSSO;
+
+      // แสดงค่าตามการติ๊ก
+      lateDeductionsCell.textContent = deductLate ? lateDeductionsCell.getAttribute('data-original') : '0.00';
+      leaveDeductionsCell.textContent = deductLeave ? leaveDeductionsCell.getAttribute('data-original') : '0.00';
+      otPayCell.textContent = includeOT ? otPayCell.getAttribute('data-original') : '0.00';
+      ssoCell.textContent = includeSSO ? ssoCell.getAttribute('data-original') : '0.00';
+
+      // ปรับยอดรวม
+      salaryAfterTotal += adjustment;
+      totalAdj += otherIncome;
+      totalDow += otherDeductions;
+    }
+  });
+
+  // อัพเดทยอดรวมทั้งหมด
+  document.getElementById('salaryAfter').textContent = salaryAfterTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalAdj').textContent = totalAdj.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  document.getElementById('totalDow').textContent = totalDow.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const toggleAllEmployees = (checked) => {
+  const checkboxes = document.querySelectorAll('.select-employeesalary');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = checked;
+  });
+  updateAllTotals();
+};
+
+document.querySelectorAll('.select-employeesalary').forEach(checkbox => {
+  checkbox.addEventListener('change', updateAllTotals);
+});
+
+const selectAllEmployees = (select) => {
+  const checkboxes = document.querySelectorAll('.select-employeesalary');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = select;
+  });
+  updateAllTotals();
+  
+  if (checkboxes.length > 0) {
+    createToast(select ? "✅ เลือกพนักงานทั้งหมดแล้ว" : "✅ ยกเลิกการเลือกทั้งหมดแล้ว", 1);
+  }
+};
+
+const actionSummary = () => {
+  event.preventDefault();
+  const summaryData = [];
+  const key = document.getElementById('dataSalaryKey').value;
+  const rows = document.querySelectorAll('#tableDataSalary tr');
+  let dueDate = document.getElementById('dataSalary').value;
+
+  if (!dueDate) {
+    createToast("⚠️ กรุณาเลือกวันที่กำหนดชำระ", 3);
+    return;
+  }
+
+  if (rows.length === 0) {
+    createToast("⚠️ กรุณาดึงข้อมูลก่อนนำส่ง", 3);
+    return;
+  }
+
+  const details = [];
+  let totalLateDeductions = 0;
+  let totalLeaveDeductions = 0;
+  let totalOTIncome = 0;
+  let totalSocialSecurity = 0;
+  let totalOtherDeductions = 0;
+  let totalOtherIncome = 0;
+  let totalRowIncome = 0;
+
+  let salaryBeforeTotal = parseFloat(document.getElementById('salaryBefore').textContent.replace(/,/g, '')) || 0;
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const period = cells[0]?.innerText.trim();
+    const [uidUser, fullName, department, group] = cells[1]?.innerText.trim().split('\n') || [];
+    const salary = parseFloat(cells[2]?.innerText.replace(/,/g, '') || 0);
+    const specialAllowance = parseFloat(cells[3]?.innerText.replace(/,/g, '') || 0);
+    const lateHours = parseFloat(cells[4]?.innerText.replace(/,/g, '') || 0);
+    const sickLeave = parseFloat(cells[5]?.innerText.replace(/,/g, '') || 0);
+    const personalLeave = parseFloat(cells[6]?.innerText.replace(/,/g, '') || 0);
+    const vacationLeave = parseFloat(cells[7]?.innerText.replace(/,/g, '') || 0);
+    const otherLeave = parseFloat(cells[8]?.innerText.replace(/,/g, '') || 0);
+    const lateDeductions = parseFloat(cells[9]?.innerText.replace(/,/g, '') || 0);
+    const leaveDeductions = parseFloat(cells[10]?.innerText.replace(/,/g, '') || 0);
+    const otHours = parseFloat(cells[11]?.innerText.replace(/,/g, '') || 0);
+    const otIncome = parseFloat(cells[12]?.innerText.replace(/,/g, '') || 0);
+    const otherIncome = parseFloat(cells[13]?.querySelector('input').value || 0);
+    const otherDeductions = parseFloat(cells[14]?.querySelector('input').value || 0);
+    const socialSecurity = parseFloat(cells[15]?.innerText.replace(/,/g, '') || 0);
+    const totalIncome = parseFloat(cells[16]?.innerText.replace(/,/g, '') || 0);
+
+    totalLateDeductions += lateDeductions;
+    totalLeaveDeductions += leaveDeductions;
+    totalOTIncome += otIncome;
+    totalSocialSecurity += socialSecurity;
+    totalOtherDeductions += otherDeductions;
+    totalOtherIncome += otherIncome;
+    totalRowIncome += totalIncome;
+
+    details.push({
+      uidUser,
+      fullName,
+      department,
+      group,
+      salary,
+      specialAllowance,
+      lateHours,
+      sickLeave,
+      personalLeave,
+      vacationLeave,
+      otherLeave,
+      lateDeductions,
+      leaveDeductions,
+      otHours,
+      otIncome,
+      otherIncome,
+      otherDeductions,
+      socialSecurity,
+      totalIncome
+    });
+  });
+
+  if (rows.length > 0) {
+    const period = rows[0].querySelectorAll('td')[0]?.innerText.trim();
+    summaryData.push({
+      key,
+      period,
+      status: 'รอดำเนินการ',
+      day: new Date().toLocaleDateString('th-TH'),
+      dueDate,
+      details,
+      totalLateDeductions,
+      totalLeaveDeductions,
+      totalOTIncome,
+      totalSocialSecurity,
+      totalOtherDeductions,
+      totalOtherIncome,
+      salaryBeforeTotal,
+      totalRowIncome
+    });
+  }
+
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+
+  if (!key) {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      await updateSpecificSummaryData();
+      clearSummaryData();
+      createToast("✅ นำส่งข้อมูลสำเร็จ", 1);
+    }).saveSummary(summaryData);
+  } else {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      await updateSpecificSummaryData();
+      clearSummaryData();
+      createToast("✅ แก้ไขข้อมูลนำส่งสำเร็จ", 1);
+    }).updateSummary(summaryData);
+  }
+};
+
+const clearSummaryData = () => { 
+  document.getElementById('dataSalary').value = "";
+  document.getElementById('dataSalaryKey').value = "";
+  const selectPeriod = document.getElementById('selectPeriod');
+  selectPeriod.value = '';
+  const tableData = document.getElementById('tableDataSalary');
+  tableData.innerHTML = '';  
+  if (!tableData.innerHTML.trim()) {
+    tableData.innerHTML = `
+    <tr>
+      <td colspan="17" class="fw-bold text-danger text-center p-4">
+        <i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓
+      </td>
+    </tr>`;
+  }
+
+  document.getElementById('deductLate').checked = true; 
+  document.getElementById('deductLeave').checked = true;
+  document.getElementById('includeOT').checked = true; 
+  document.getElementById('includeSSO').checked = true;
+  document.getElementById('salaryBefore').innerText = "0.00";
+  document.getElementById('salaryAfter').innerText = "0.00";
+  document.getElementById('totalAdj').innerText = "0.00";
+  document.getElementById('totalDow').innerText = "0.00";
+  changePage(5);
+};
+</script>
