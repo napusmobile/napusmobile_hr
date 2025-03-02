@@ -1,0 +1,322 @@
+<div class="row g-3 mt-2">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm mb-2">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-4 mb-2 mb-md-0">📢 จัดการข่าวสาร</div>
+          <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end">
+          <select class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" onchange="updateItemsNewsDB(this.value)">
+            <option value="10">✅ 10</option>
+            <option value="20">✅ 25</option>
+            <option value="50">✅ 50</option>
+            <option value="100">✅ 100</option>
+            <option value="all">✅ ทั้งหมด</option>
+          </select>
+            <input type="search" class="form-control float-sm-end me-2 mb-2 mb-md-0" style="width: auto;" id="searchNewsDB" placeholder="🔍ค้นหาข้อมูล..." oninput="filterNewsDB()">
+          </div>
+        </div>
+      </div>
+      <div class="card-body rounded-4">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">วันที่</th>
+                <th scope="col" class="text-center">เรื่อง</th>
+                <th scope="col" class="text-center">รายละเอียด</th>
+                <th scope="col" class="text-center">ผู้ลง/หน่วยงาน</th>
+                <th scope="col" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableNewsDB">
+            
+            </tbody>       
+          </table>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0 align-items-center" id="paginationNewsDBInfo"></div>
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div id="paginationNewsDB" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 mb-2 mb-md-0">📑 ข้อมูลข่าวสาร</div>
+          <div class="col-12 col-md-6 d-flex flex-wrap justify-content-md-end">
+          </div>
+        </div>
+      </div>
+        <div class="card-body rounded-4">
+          <form id="addFormNewsDB">
+            <input type="text" class="form-control" id="dataNewsDBKey" name="dataNewsDBKey" hidden>
+            <div class="row mt-2">
+              <div class="col-md-12">
+                <div class="mb-1">
+                  <label class="control-label"> ชื่อเรื่อง <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control " id="newsDBData1" name="newsDBData1" placeholder="กรุณากรอกชื่อเรื่องที่นี่">
+                </div>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-12">
+                <div class="mb-1">
+                  <label class="control-label"> รายละเอียด <span class="text-danger">*</span></label>
+                  <textarea type="text" class="form-control " id="newsDBData2" name="newsDBData2" rows="4" placeholder="กรุณากรอกรายละเอียดที่นี่"></textarea>
+                </div>
+              </div>            
+            </div>
+            <div class="mt-2">
+              <button type="submit" class="btn set-button me-2" onclick="submitFormNewsDB()">บันทึก</button>
+              <button type="button" class="btn del-button" onclick="clearFormNewsDB()">ยกเลิก</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let filteredAllDataNewsDB = [];
+let currentNewsDB = 1;
+let itemsPerNewsDB = 10;
+
+const renderAllDataNewsDB = (res) => {
+  const table = document.getElementById('tableNewsDB');
+  table.innerHTML = '';
+
+  res.sort((a, b) => {
+    const dateA = new Date(a[1].split('/').reverse().join('/'));
+    const dateB = new Date(b[1].split('/').reverse().join('/'));
+    return dateB - dateA;
+  });
+
+  const startIndex = (currentNewsDB - 1) * itemsPerNewsDB;
+  const endIndex = startIndex + itemsPerNewsDB;
+  const newdb = res.slice(startIndex, endIndex);
+
+  const startRow = startIndex + 1;
+  const endRow = startIndex + newdb.length;
+  const totalRows = res.length;
+
+  document.getElementById('paginationNewsDBInfo').innerText = `แสดง ${startRow} ถึง ${endRow} จาก ${totalRows} แถว`;
+
+  if (newdb.length === 0) {
+    const row = table.insertRow();
+    row.innerHTML = `<td colspan='6' class='fw-bold text-danger text-center p-4'><i class='fa-solid fa-circle-info text-danger'></i> ไม่พบข้อมูล! 😓</td>`;
+    return;
+  }
+
+  newdb.forEach((rowIndex, index) => {
+    let user = dataUsers && dataUsers.find(user => user[3] === rowIndex[4]);
+    let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+
+    var row = table.insertRow();
+    row.innerHTML = `
+      <td class="text-center"><span style="font-size: 14px;">${startIndex + index + 1}</span></td>
+      <td class="text-center"><span style="font-size: 14px;">${rowIndex[1]}</span></td>
+      <td><span style="font-size: 14px;">${rowIndex[2]}</span></td>
+      <td><span style="font-size: 14px;">${rowIndex[3]}</span></td>
+      <td>
+        <div style="display: flex; align-items: center;">
+          <img src="${userImage}" alt="ImageUsers" width="30" style="margin-right: 10px;">
+          <div style="font-size: 14px;">
+            <span>ชื่อ: ${rowIndex[4]}</span><br>
+            <span>หน่วยงาน: ${rowIndex[5]}</span><br>
+          </div>
+        </div>
+      </td>
+      <td class="text-center">
+        <div style="display: flex; justify-content: center;">
+          <button type='button' class='btn btn-sm me-2 edit-button' onclick='editNewsDB("${rowIndex[0]}");'><i class='fa-solid fa-pen-to-square'></i></button>
+          <button type='button' class='btn btn-sm me-2 del-button' onclick='delNewsDB("${rowIndex[0]}");'><i class='fa-solid fa-trash-can'></i></button>
+        </div>
+      </td>
+    `;
+  });
+}
+
+const renderPageAllDataNewsDB = (totalItems) => {
+  const totalPages = Math.ceil(totalItems / itemsPerNewsDB);
+  const paginationContainer = document.getElementById('paginationNewsDB');
+  paginationContainer.innerHTML = '';
+  if (totalPages > 1) {
+    const createPageButton = (text, page, isDisabled = false, isActive = false) => {
+      const li = document.createElement('li');
+      li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+      const button = document.createElement('button');
+      button.className = 'page-link';
+      button.innerText = text;
+      button.onclick = () => {
+        if (!isDisabled) {
+        currentNewsDB = page;
+        renderAllDataNewsDB(allDataNewsDB);
+        renderPageAllDataNewsDB(dataUsers.length);
+        }
+      };
+      li.appendChild(button);
+      return li;
+    };
+    paginationContainer.appendChild(createPageButton('ย้อนกลับ', currentNewsDB - 1, currentNewsDB === 1));
+
+    if (currentNewsDB > 2) {
+      paginationContainer.appendChild(createPageButton(1, 1, false, currentNewsDB === 1));
+      if (currentNewsDB > 3) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+    }
+    paginationContainer.appendChild(createPageButton(currentNewsDB, currentNewsDB, false, true));
+
+    if (currentNewsDB < totalPages - 1) {
+      if (currentNewsDB < totalPages - 2) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationContainer.appendChild(ellipsis);
+      }
+      paginationContainer.appendChild(createPageButton(totalPages, totalPages, false, currentNewsDB === totalPages));
+    }
+    paginationContainer.appendChild(createPageButton('ถัดไป', currentNewsDB + 1, currentNewsDB === totalPages));
+  }
+}
+
+const filterNewsDB = () => {
+  const query = document.getElementById('searchNewsDB').value.toLowerCase();
+  filteredAllDataNewsDB = allDataNewsDB.filter(row => {
+    return row.some(column => column.toLowerCase().includes(query));
+  });
+
+  currentNewsDB = 1;
+  renderAllDataNewsDB(filteredAllDataNewsDB);
+  renderPageAllDataNewsDB(filteredAllDataNewsDB.length);
+}
+
+const updateItemsNewsDB = (value) => {
+  if (value === "all") {
+    itemsPerNewsDB = filteredAllDataNewsDB.length;
+  } else {
+    itemsPerNewsDB = parseInt(value, 10);
+  }
+
+  currentNewsDB = 1;
+  renderAllDataNewsDB(filteredAllDataNewsDB);
+  renderPageAllDataNewsDB(filteredAllDataNewsDB.length);
+}
+
+const stripHtmlTags = (html) => {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || "";
+}
+
+const submitFormNewsDB = () => {
+  event.preventDefault();
+  $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+  const strippedNews2 = stripHtmlTags(document.getElementById('newsDBData2').value);
+
+  const obj = {
+    key: document.getElementById('dataNewsDBKey').value,
+    fullname: document.getElementById('user-show1').innerText,
+    dpm: document.getElementById('user-show2').innerText,
+    news1: document.getElementById('newsDBData1').value,
+    news2: strippedNews2
+  }
+
+  if (!obj.fullname || !obj.dpm || !obj.news1 || !obj.news2) {
+    createToast("⚠️ กรุณากรอกข้อมูลให้ครบถ้วน", 3);
+    $.LoadingOverlay("hide");
+    return;
+  }
+
+  if (!obj.key) {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      await updateSpecificNewsDBData();
+      clearFormNewsDB();
+      createToast("✅ บันทึกข้อมูลสำเร็จ", 1);
+    }).addDataNewsDB(obj);
+  } else {
+    google.script.run.withSuccessHandler(async (res) => {
+      $.LoadingOverlay("hide");
+      await updateSpecificNewsDBData();
+      clearFormNewsDB();
+      createToast("✅ แก้ไขข้อมูลสำเร็จ", 1);
+    }).upDataNewsDB(obj);
+  }
+}
+
+const editNewsDB = (codeId) => {
+  const rowIndex = allDataNewsDB.find(row => row[0] === codeId);
+  if (rowIndex) {
+    $('#dataNewsDBKey').val(rowIndex[0]);
+    $('#newsDBData1').val(rowIndex[2]);
+    $('#newsDBData2').summernote('code', rowIndex[3]);
+  }
+}
+
+const delNewsDB = (codeID) => {
+  let rowIndex = allDataNewsDB.find(row => row[0] === codeID);
+  if (rowIndex) {
+    $('#confirmBtnDel').off('click').on('click', function() {
+      $.LoadingOverlay("show", { image: "", fontawesome: "fa fa-spinner fa-spin" });
+      $('#DelDataModal').modal('hide');
+      google.script.run.withSuccessHandler(async (res) => {
+        rowIndex = allDataNewsDB.filter(row => row[0] !== codeID);
+        $.LoadingOverlay("hide");
+        await updateSpecificNewsDBData();
+        createToast("⛔ ลบข้อมูลสำเร็จ", 0);
+      }).delDataNewsDB(codeID);
+    });
+    $('#xDelconfirmData').off('click').on('click', function() {
+      $('#DelDataModal').modal('hide');
+    });
+    $('#DelDataModal').modal('show');
+  }
+}
+
+const clearFormNewsDB = () => {
+  document.getElementById('dataNewsDBKey').value = "";
+  document.getElementById('newsDBData1').value = "";
+  $('#newsDBData2').summernote('reset');
+  createToast("🔄 ล้างค่าเรียบร้อยแล้ว", 0);
+}
+
+const renderAllAnnouncements = (newsData) => {
+  const announcementContainer = document.getElementById('showTableNewsDB');
+  announcementContainer.innerHTML = '';
+
+  newsData.sort((a, b) => {
+    const dateA = new Date(a[1].split('/').reverse().join('/'));
+    const dateB = new Date(b[1].split('/').reverse().join('/'));
+    return dateB - dateA;
+  });
+
+  newsData.forEach(newsItem => {
+    let user = dataUsers && dataUsers.find(user => user[3] === newsItem[4]);
+    let userImage = user ? user[7] : 'https://cdn.jsdelivr.net/gh/napusmobile/napusmobile@main/logo.png';
+    const announcementDiv = document.createElement('div');
+    announcementDiv.className = 'announcement-item';
+    announcementDiv.innerHTML = `
+      <div class="announcement-header d-flex align-items-center">
+        <img src="${userImage}" alt="ProFile" class="rounded-circle" width="40" height="40">
+        <div>
+          <div class="announcement-date">ระบบบริการ | Epic Coding Channel</div>
+          <div class="announcement-name">${newsItem[4]} - ${newsItem[5]}</div>
+        </div>
+      </div>
+      <a type="button" class="announcement-title mt-2">
+        เรื่อง: ${newsItem[2]} รายละเอียด: ${newsItem[3]}
+      </a>
+    `;
+    announcementContainer.appendChild(announcementDiv);
+  });
+};
+</script>
